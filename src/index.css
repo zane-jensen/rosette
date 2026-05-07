@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-green: #05E5AF;
+  --color-orange: #FFAB3C;
+  --color-pink: #FF66CC;
+  --color-taupe: #F3EFE8;
+  --color-burgundy: #56012F;
+  --color-slate: #282A3B;
+  --color-dark-slate: #202230;
+
+  --color-editor-bg: var(--color-slate);
+
+  --inset-shadow-md: inset 1px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+#root {
+  color: white;
+  background-color: var(--color-dark-slate);
+  height: 100vh;
+}
+
+html {
+  color: white;
+}
