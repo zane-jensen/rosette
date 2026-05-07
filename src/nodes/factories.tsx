@@ -21,11 +21,11 @@ export const createUnorderedListNode = (): UnorderedListNode => ({
 
 
 
-export const createListItemNode = (): ListItemNode => ({
+export const createListItemNode = (startingText?: string): ListItemNode => ({
     id: crypto.randomUUID(),
     type: NODE_TYPES.LIST_ITEM,
     nodes: [
-        createTextNode()
+        createTextNode(startingText)
     ]
 })
 

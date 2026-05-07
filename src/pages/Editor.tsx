@@ -89,7 +89,7 @@ const Editor = () => {
 
     return (
         <Panel>
-            <div className="flex flex-col gap-4 min-w-150">
+            <div className="flex flex-col gap-4 min-w-125 max-w-150">
                 <p>Editor</p>
 
                 <div
@@ -118,6 +118,7 @@ const Editor = () => {
                     <button className="border-1 border-green rounded-md px-8 w-max hover:bg-green/20 cursor-pointer" onMouseDown={(e) => e.preventDefault()} onClick={() => deleteFocused()}>Delete</button>
                 </div>
             </div>
+            {true && <pre className='w-100 absolute top-[100%]'>{JSON.stringify(nodes, null, 2)}</pre>}
         </Panel>
     )
 }

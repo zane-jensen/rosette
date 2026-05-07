@@ -16,10 +16,10 @@
 
 #root {
   color: white;
-  background-color: var(--color-dark-slate);
-  height: 100vh;
+  min-height: 100vh;
 }
 
 html {
   color: white;
+  background-color: var(--color-dark-slate);
 }
