@@ -1,13 +1,15 @@
 import type { ReactNode } from "react"
+import type { ListItemNode } from "../nodes/types";
 
 interface IListItem {
-    children?: ReactNode
+    node: ListItemNode
+    children: ReactNode
 }
 
 
-const ListItem = ({children}: IListItem) => {
+const ListItem = ({node, children}: IListItem) => {
     return (
-        <li>{children}</li>
+        <li data-node-id={node.id}>{children}</li>
     )
 }
 

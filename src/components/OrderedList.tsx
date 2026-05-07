@@ -1,11 +1,13 @@
+import type { OrderedListNode } from "../nodes/types";
 
 interface IOrderedList {
-    children?: React.ReactNode
+    node: OrderedListNode;
+    children?: React.ReactNode;
 }
 
-const OrderedList = ({children}: IOrderedList) => {
+const OrderedList = ({node, children}: IOrderedList) => {
     return (
-        <ol className="list-decimal pl-6 w-full text-left">
+        <ol data-node-id={node.id} className="list-decimal pl-6 w-full text-left">
             {children}
         </ol>
     )

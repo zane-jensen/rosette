@@ -1,12 +1,14 @@
+import type { UnorderedListNode } from "../nodes/types";
 
 
 interface IUnorderedList {
-    children?: React.ReactNode
+    node: UnorderedListNode;
+    children?: React.ReactNode;
 }
 
-const UnorderedList = ({children}: IUnorderedList) => {
+const UnorderedList = ({node, children}: IUnorderedList) => {
     return (
-        <ul className="list-disc pl-6 w-full text-left">
+        <ul data-node-id={node.id} className="list-disc pl-6 w-full text-left">
             {children}
         </ul>
     )

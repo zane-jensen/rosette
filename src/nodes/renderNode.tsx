@@ -8,28 +8,28 @@ export const renderNode = (node: RosetteNode) => {
     switch (node.type) {
         case NODE_TYPES.ORDERED_LIST:
             return (
-                <OrderedList key={node.id}>
+                <OrderedList node={node} key={node.id}>
                     {node.nodes.map((child: RosetteNode) => renderNode(child))}
                 </OrderedList>
             )
             
         case NODE_TYPES.UNORDERED_LIST:
             return (
-                <UnorderedList key={node.id}>
+                <UnorderedList node={node} key={node.id}>
                     {node.nodes.map((child: RosetteNode) => renderNode(child))}
                 </UnorderedList>
             )
 
         case NODE_TYPES.LIST_ITEM:
             return (
-                <ListItem key={node.id}>
+                <ListItem node={node} key={node.id}>
                     {node.nodes.map((child: RosetteNode) => renderNode(child))}
                 </ListItem>
             )
 
         case NODE_TYPES.TEXT:
             return (
-                <TextElement key={node.id} content={node.content} />
+                <TextElement node={node} key={node.id} content={node.content} />
             )
 
         default:

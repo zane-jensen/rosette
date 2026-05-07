@@ -12,7 +12,7 @@ const ToolbarButton = ({buttonText, node, onClick}: IToolbarButton) => {
     }
 
     return (
-        <button onClick={clickHandler} className="cursor-pointer">{buttonText}</button>
+        <button onMouseDown={(e) => e.preventDefault()} onClick={clickHandler} className="cursor-pointer">{buttonText}</button>
     )
 }
 
