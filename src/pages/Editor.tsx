@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Panel from "../components/Panel";
 import ToolbarButton from "../components/ToolbarButton";
-import { NODE_TYPES, type RosetteNode } from "../nodes/types";
+import { type RosetteNode } from "../nodes/types";
 import { renderNode } from "../nodes/renderNode";
 import { createOrderedListNode, createTextNode, createUnorderedListNode } from "../nodes/factories";
 
