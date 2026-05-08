@@ -32,3 +32,9 @@ export type RosetteNode =
     UnorderedListNode | 
     ListItemNode |
     TextNode
+
+
+export interface FindNodeResult {
+    node: RosetteNode,
+    nodePath: number[]
+}

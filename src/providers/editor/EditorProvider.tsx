@@ -1,13 +1,14 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
-import type { RosetteNode } from "../../nodes/types";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { NODE_TYPES, type RosetteNode } from "../../nodes/types";
 import { createListItemNode, createOrderedListNode, createTextNode, createUnorderedListNode } from "../../nodes/factories";
 import { findNodeById, updateNodeById } from "../../nodes/utils";
 
 interface EditorContextValue {
     nodes: RosetteNode[];
+    replaceNodes: (updatedNodes: RosetteNode[]) => void;
     updateNode: (node: RosetteNode) => RosetteNode[];
-    appendNode: (node: RosetteNode, sourceNodes?: RosetteNode[]) => RosetteNode[];
-    deleteNodeById: (nodeId: string) => RosetteNode[];
+    focusNode: (nodeId: string) => void;
+    flushActiveText: () => RosetteNode[];
 }
 
 const EditorContext = createContext<EditorContextValue | null>(null);
@@ -19,6 +20,7 @@ export const useEditor = () => {
 }
 
 export const EditorProvider = ({children}: {children: ReactNode}) => {
+    const [focusNextId, setFocusNextId] = useState<string | null>(null);
     const [nodes, setNodes] = useState<RosetteNode[]>([
         createTextNode("Ordered List"),
         {
@@ -49,6 +51,10 @@ export const EditorProvider = ({children}: {children: ReactNode}) => {
         createTextNode("It's not very user friendly yet! But once we get more inline controls it'll start feeling good!")
     ]);
 
+    const replaceNodes = (updatedNodes: RosetteNode[]) => {
+        setNodes(updatedNodes);
+    }
+
     const updateNode = (node: RosetteNode) => {
         const updatedNodes = updateNodeById([...nodes], node.id, node);
         setNodes(updatedNodes);
@@ -56,35 +62,50 @@ export const EditorProvider = ({children}: {children: ReactNode}) => {
         return updatedNodes
     }
 
-    const appendNode = (node: RosetteNode, sourceNodes?: RosetteNode[]) => {
-        const updatedNodes = [...(sourceNodes || nodes), node];
-        setNodes(updatedNodes);
+    // save active text data before doing anything, should call before and command
+    const flushActiveText = () => {
+        const focused = document.activeElement as HTMLElement | null;
 
-        return updatedNodes;
-    }
+        if (!focused) return nodes;
 
-    const deleteNodeById = (nodeId: string) => {
-        const target = findNodeById(nodes, nodeId);
+        const nodeId = focused.dataset.nodeId;
+        const nodeType = focused.dataset.nodeType;
 
-        if (!target) {
-            console.log("No target node found to delete");
-            return nodes;
+        if (!nodeId || nodeType !== NODE_TYPES.TEXT) return nodes;
+
+        const updatedNode = {
+            id: nodeId,
+            type: NODE_TYPES.TEXT,
+            content: focused.textContent
         }
 
-        const {node, nodePath} = target;
-
-        if (nodePath.length === 1) {
-            const updatedNodes = [...nodes].filter(n => n.id !== node.id);
-            console.log(updatedNodes);
-            setNodes(updatedNodes);
-            return updatedNodes;
-        }
-
-        return nodes;
+        return updateNodeById(nodes, nodeId, updatedNode);
     }
+
+    const focusNode = (nodeId: string) => {
+        setFocusNextId(nodeId);
+    }
+
+    useEffect(() => {
+        if (!focusNextId) return;
+
+        const focusedNode = findNodeById(nodes, focusNextId);
+        if (!focusedNode) return;
+
+        const element = document.querySelector(
+            `[data-node-id="${focusNextId}"]`
+        ) as HTMLElement | null;
+
+        if (!element) return;
+
+        element.focus();
+
+        setFocusNextId(null);
+
+    }, [nodes, focusNextId])
 
     return (
-        <EditorContext.Provider value={{nodes, updateNode, appendNode, deleteNodeById}}>
+        <EditorContext.Provider value={{nodes, replaceNodes, updateNode, focusNode, flushActiveText}}>
             {children}
         </EditorContext.Provider>
     )

@@ -29,7 +29,7 @@ export const renderNode = (node: RosetteNode) => {
 
         case NODE_TYPES.TEXT:
             return (
-                <TextElement node={node} key={node.id} content={node.content} />
+                <TextElement node={node} key={node.id} />
             )
 
         default:

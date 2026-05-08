@@ -7,7 +7,7 @@ interface IOrderedList {
 
 const OrderedList = ({node, children}: IOrderedList) => {
     return (
-        <ol data-node-id={node.id} className="list-decimal pl-6 w-full text-left">
+        <ol data-node-id={node.id} data-node-type={node.type} className="list-decimal pl-6 w-full text-left">
             {children}
         </ol>
     )

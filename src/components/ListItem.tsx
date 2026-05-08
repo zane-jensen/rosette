@@ -9,7 +9,7 @@ interface IListItem {
 
 const ListItem = ({node, children}: IListItem) => {
     return (
-        <li data-node-id={node.id}>{children}</li>
+        <li data-node-id={node.id} data-node-type={node.type}>{children}</li>
     )
 }
 
