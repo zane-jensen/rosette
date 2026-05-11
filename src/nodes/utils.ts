@@ -1,14 +1,24 @@
 
+import { NodeRange } from "../types/NodeRange";
 import type { FindNodeResult, RosetteNode } from "./types";
 
 
 export const getParentPath = (path: number[]) => path.slice(0, -1);
 
-export const getFocusedId = () => {
-    const focusedElement = document.activeElement;
-    const focusedId = focusedElement?.getAttribute("data-node-id");
+export const getActiveElement = () => {
+    const selection = window.getSelection();
+    const anchorNode = selection?.anchorNode;
+    if (!anchorNode) return null;
 
-    return focusedId;
+    const element = getElementFromDOMNode(anchorNode);
+    return element;
+}
+
+export const getActiveNode = (nodes: RosetteNode[]): FindNodeResult | null => {
+    const element = getActiveElement();
+    if (!element) return null;
+
+    return findNodeById(nodes, element.dataset.nodeId!);
 }
 
 export const getNodeAtPath = (nodes: RosetteNode[], path: number[]) => {
@@ -25,6 +35,81 @@ export const getNodeAtPath = (nodes: RosetteNode[], path: number[]) => {
     }
 
     return currentNode;
+}
+
+/**
+ * Gets the first element tagged with data-node-id from DOM Node.
+ * @param node 
+ * @returns 
+ */
+const getElementFromDOMNode = (node: Node): HTMLElement | null => {
+    const element = node.nodeType === Node.TEXT_NODE ? node.parentElement : node as HTMLElement | null;
+    return element?.closest("[data-node-id]") as HTMLElement | null;
+}
+
+const getSelectedElements = () => {
+    const selection = window.getSelection();
+    if (!selection || selection.isCollapsed || selection.rangeCount === 0) return null;
+
+    const range = selection.getRangeAt(0);
+
+    const startNode = range.startContainer;
+    const endNode = range.endContainer;
+
+    const startElement = getElementFromDOMNode(startNode);
+    const endElement = getElementFromDOMNode(endNode);
+
+    if (!startElement || !endElement) return null;
+
+    return {
+        startElement: startElement,
+        endElement: endElement,
+        startOffset: range.startOffset,
+        endOffset: range.endOffset
+    }
+}
+
+export const getSelectedNodes = (nodes: RosetteNode[]) => {
+    const elementRange = getSelectedElements();
+    if (!elementRange) return null;
+
+    const {
+        startElement,
+        endElement,
+        startOffset,
+        endOffset
+    } = elementRange;
+
+    const startNode = findNodeById(nodes, startElement.dataset.nodeId!);
+    const endNode = findNodeById(nodes, endElement.dataset.nodeId!);
+
+    if (!startNode || !endNode) return null;
+
+    return new NodeRange(
+        startNode,
+        endNode,
+        startOffset,
+        endOffset
+    );
+}
+
+export const splitTextElement = (element: HTMLElement) => {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return ["", element.textContent];
+    
+    const range = selection.getRangeAt(0);
+    const text = element.textContent ?? "";
+
+    const preCaretRange = range.cloneRange();
+    preCaretRange.selectNodeContents(element);
+    preCaretRange.setEnd(range.startContainer, range.startOffset);
+
+    const offset = preCaretRange.toString().length;
+
+    return [
+        text.slice(0, offset),
+        text.slice(offset)
+    ]
 }
 
 
@@ -94,12 +179,49 @@ export const insertNodeAfter = (nodes: RosetteNode[], targetNodeId: string, newN
         return [...nodes.slice(0, target.nodePath[0] + 1), newNode, ...nodes.slice(target.nodePath[0] + 1)];
     }
 
+    const targetPathOffset = target.nodePath[target.nodePath.length - 1] + 1;
     const updatedParent = {
         ...parent,
-        nodes: [...parent.nodes, newNode]
+        nodes: [...parent.nodes.slice(0, targetPathOffset), newNode, ...parent.nodes.slice(targetPathOffset)]
     }
 
     return updateNodeById(nodes, parent.id, updatedParent);
+}
+
+
+export const getNodeBefore = (nodes: RosetteNode[], targetNodeId: string): RosetteNode | null => {
+    var target = findNodeById(nodes, targetNodeId);
+    if (!target) return null
+
+    while (true) {
+        const parentPath = getParentPath(target.nodePath);
+        const parent = getNodeAtPath(nodes, parentPath);
+        const targetOrder = target.nodePath[target.nodePath.length - 1];
+
+        if (!parent || !("nodes" in parent)) return nodes[targetOrder - 1];
+
+        if (targetOrder === 0) {
+            target = {node: parent, nodePath: parentPath}
+            continue;
+        }
+
+        return parent.nodes[targetOrder - 1];
+    }
+}
+
+export const findNodeOfType = (parentNode: RosetteNode, nodeType: string): RosetteNode | null => {
+    var targetNode = parentNode;
+
+    if (targetNode.type === nodeType) return targetNode;
+
+    if (!("nodes" in targetNode)) return null;
+
+    for (let node of [...targetNode.nodes].reverse()) {
+        const foundNode = findNodeOfType(node, nodeType);
+        if (foundNode) return foundNode;
+    }
+
+    return null;
 }
 
 

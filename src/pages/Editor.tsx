@@ -1,30 +1,150 @@
 import Panel from "../components/Panel";
 import ToolbarButton from "../components/ToolbarButton";
-import { type RosetteNode } from "../nodes/types";
+import { NODE_TYPES, type RosetteNode } from "../nodes/types";
 import { renderNode } from "../nodes/renderNode";
-import { createOrderedListNode, createUnorderedListNode } from "../nodes/factories";
-import { getFocusedId } from "../nodes/utils";
+import { createListItemNode, createOrderedListNode, createTextNode, createUnorderedListNode } from "../nodes/factories";
+import { deleteNodeById, findNodeById, findNodeOfType, getActiveElement, getActiveNode, getNodeAtPath, getNodeBefore, getParentPath, getSelectedNodes, insertNodeAfter, splitTextElement, updateNodeById } from "../nodes/utils";
 import { useEditor } from "../providers/editor/EditorProvider";
 import { deleteNode, insertToolbarNode } from "../nodes/commands";
+import { type KeyboardEvent } from "react";
 
 
 const Editor = () => {
-    const {nodes, replaceNodes, flushActiveText} = useEditor();
+    const {nodes, replaceNodes, flushDirtyNodes, focusNode, addDirtyNode} = useEditor();
 
-    const deleteFocused = () => {
-        var focusedId = getFocusedId();
-        if (!focusedId) return;
+    const toolbarHandler = (node: RosetteNode) => {
+        const syncedNodes = flushDirtyNodes();
 
-        const updatedNodes = deleteNode(nodes, focusedId);
+        const element = getActiveElement();
+        const updatedNodes = insertToolbarNode(syncedNodes, node, element?.dataset.nodeId);
+        replaceNodes(updatedNodes);
+
+        const newTextNode = findNodeOfType(node, NODE_TYPES.TEXT);
+        if (newTextNode) focusNode(newTextNode.id);
+    }
+
+    const blurHandler = () => {
+        const updatedNodes = flushDirtyNodes();
         replaceNodes(updatedNodes);
     }
 
-    const toolbarHandler = (node: RosetteNode) => {
-        const syncedNodes = flushActiveText();
+    const inputHandler = () => {
+        const element = getActiveElement();
+        if (!element) return;
 
-        const focusedId = getFocusedId();
-        const updatedNodes = insertToolbarNode(syncedNodes, node, focusedId);
-        replaceNodes(updatedNodes);
+        addDirtyNode(element.dataset.nodeId!);
+    }
+
+    const keyDownHandler = (e: KeyboardEvent<HTMLParagraphElement>) => {
+        if (e.key == "Enter") {
+            e.preventDefault();
+
+            const syncedNodes = flushDirtyNodes();
+            
+            const element = getActiveElement();
+            if (!element) return;
+
+            const elementNodeId = element.dataset.nodeId;
+            if (!elementNodeId) return;
+
+            const listItemElement = element.closest(
+                `[data-node-type=${NODE_TYPES.LIST_ITEM}]`
+            ) as HTMLElement | null;
+
+            const target = findNodeById(syncedNodes, elementNodeId);
+            if (!target) return;
+            const {node} = target;
+
+            if (node.type !== NODE_TYPES.TEXT) return;
+
+            const [formerText, latterText] = splitTextElement(element);
+
+            // if the text is in a list item element
+            const listItemElementId = listItemElement?.dataset.nodeId;
+
+            var newNode;
+            var newNodeParentId;
+            if (listItemElementId) {
+                // if the text is currently blank, exit out of the list
+                if (element.innerText === "") {
+                    const newTextNode = createTextNode();
+
+                    const listItemTarget = findNodeById(syncedNodes, listItemElementId);
+                    if (!listItemTarget) return;
+
+                    const listNode = getNodeAtPath(syncedNodes, getParentPath(listItemTarget.nodePath))
+                    if (!listNode) return;
+                    
+                    let updatedNodes = insertNodeAfter(syncedNodes, listNode.id, newTextNode);
+                    updatedNodes = deleteNodeById(updatedNodes, listItemElementId);
+                    replaceNodes(updatedNodes);
+                    focusNode(newTextNode.id);
+                    return;
+                }
+                
+                newNode = createListItemNode(latterText);
+                newNodeParentId = listItemElementId;
+            }
+            // otherwise just add a new line below
+            else {
+                newNode = createTextNode(latterText);
+                newNodeParentId = elementNodeId;
+            }
+
+            let updatedNodes = insertNodeAfter(syncedNodes, newNodeParentId, newNode);
+            updatedNodes = updateNodeById(updatedNodes, elementNodeId, {
+                ...node,
+                content: formerText
+            });
+
+            replaceNodes(updatedNodes);
+            const childTextNode = findNodeOfType(newNode, NODE_TYPES.TEXT);
+            if (childTextNode) focusNode(childTextNode.id);
+            return;
+        }
+        
+        if (e.key === "Backspace") {
+            const syncedNodes = flushDirtyNodes();
+
+            const selection = window.getSelection();
+
+            // if items are multi-selected / highlighted
+            if (selection && !selection.isCollapsed) {
+                e.preventDefault();
+                
+                const range = getSelectedNodes(syncedNodes);
+                if (!range) return;
+
+                const deadNodes = range.nodesInRange(syncedNodes);
+                const deadNodeIds = deadNodes.map(n => n.id);
+
+                const updatedNodes = syncedNodes.filter(n => !deadNodeIds.includes(n.id));
+                replaceNodes(updatedNodes.length !== 0 ? updatedNodes : [createTextNode()]);
+            }
+
+            let target = getActiveNode(syncedNodes);
+            if (!target) return;
+
+            let {node} = target;
+
+            if (node.type !== NODE_TYPES.TEXT) return;
+
+            // if text is empty
+            if (node.content === "") {
+                e.preventDefault();
+
+                const nodeBefore = getNodeBefore(syncedNodes, node.id);
+                if (!nodeBefore) return;
+
+                const updatedNodes = deleteNode(syncedNodes, node.id);
+                replaceNodes(updatedNodes);
+
+                const textNodeBefore = findNodeOfType(nodeBefore, NODE_TYPES.TEXT);
+                if (!textNodeBefore) return;
+                
+                focusNode(textNodeBefore.id);
+            }
+        }
     }
 
     return (
@@ -33,7 +153,12 @@ const Editor = () => {
                 <p>Editor</p>
 
                 <div
-                className="flex flex-col items-start bg-(--color-dark-slate) p-4 inset-shadow-md"
+                className="flex flex-col items-start bg-(--color-dark-slate) p-4 inset-shadow-md whitespace-pre-wrap"
+                contentEditable 
+                suppressContentEditableWarning
+                onBlur={blurHandler} 
+                onInput={inputHandler}
+                onKeyDown={keyDownHandler} 
                 >
                     {nodes.map((n: RosetteNode) => renderNode(n))}
                 </div>
@@ -51,10 +176,6 @@ const Editor = () => {
                         node={createUnorderedListNode}
                         onClick={toolbarHandler} 
                     />
-                </div>
-
-                <div className="flex flex-row gap-2">
-                    <button className="border-1 border-green rounded-md px-8 w-max hover:bg-green/20 cursor-pointer" onMouseDown={(e) => e.preventDefault()} onClick={() => deleteFocused()}>Delete</button>
                 </div>
             </div>
             {true && <pre className='absolute top-[100%] left-0'>{JSON.stringify(nodes, null, 2)}</pre>}

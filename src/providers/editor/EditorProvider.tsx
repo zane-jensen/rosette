@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { NODE_TYPES, type RosetteNode } from "../../nodes/types";
 import { createListItemNode, createOrderedListNode, createTextNode, createUnorderedListNode } from "../../nodes/factories";
 import { findNodeById, updateNodeById } from "../../nodes/utils";
@@ -8,7 +8,8 @@ interface EditorContextValue {
     replaceNodes: (updatedNodes: RosetteNode[]) => void;
     updateNode: (node: RosetteNode) => RosetteNode[];
     focusNode: (nodeId: string) => void;
-    flushActiveText: () => RosetteNode[];
+    flushDirtyNodes: () => RosetteNode[];
+    addDirtyNode: (nodeId: string) => void;
 }
 
 const EditorContext = createContext<EditorContextValue | null>(null);
@@ -21,6 +22,8 @@ export const useEditor = () => {
 
 export const EditorProvider = ({children}: {children: ReactNode}) => {
     const [focusNextId, setFocusNextId] = useState<string | null>(null);
+    const dirtyNodeIdsRef = useRef<Set<string>>(new Set());
+
     const [nodes, setNodes] = useState<RosetteNode[]>([
         createTextNode("Ordered List"),
         {
@@ -63,23 +66,29 @@ export const EditorProvider = ({children}: {children: ReactNode}) => {
     }
 
     // save active text data before doing anything, should call before and command
-    const flushActiveText = () => {
-        const focused = document.activeElement as HTMLElement | null;
+    const flushDirtyNodes = (): RosetteNode[] => {
+        var pendingNodes = nodes;
+        for (let nodeId of dirtyNodeIdsRef.current) {
+            const element = document.querySelector(`[data-node-id="${nodeId}"]`);
+            const target = findNodeById(pendingNodes, nodeId);
+            if (!target || !element) continue;
 
-        if (!focused) return nodes;
+            if (target.node.type !== NODE_TYPES.TEXT) continue;
 
-        const nodeId = focused.dataset.nodeId;
-        const nodeType = focused.dataset.nodeType;
+            const updatedNode = {
+                ...target.node,
+                content: element.textContent
+            }
 
-        if (!nodeId || nodeType !== NODE_TYPES.TEXT) return nodes;
-
-        const updatedNode = {
-            id: nodeId,
-            type: NODE_TYPES.TEXT,
-            content: focused.textContent
+            pendingNodes = updateNodeById(pendingNodes, nodeId, updatedNode);
         }
 
-        return updateNodeById(nodes, nodeId, updatedNode);
+        dirtyNodeIdsRef.current.clear();
+        return pendingNodes;
+    }
+
+    const addDirtyNode = (nodeId: string): void => {
+        dirtyNodeIdsRef.current.add(nodeId);
     }
 
     const focusNode = (nodeId: string) => {
@@ -100,12 +109,21 @@ export const EditorProvider = ({children}: {children: ReactNode}) => {
 
         element.focus();
 
+        const selection = window.getSelection();
+        const range = document.createRange();
+
+        range.selectNodeContents(element);
+        range.collapse(true);
+
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+
         setFocusNextId(null);
 
     }, [nodes, focusNextId])
 
     return (
-        <EditorContext.Provider value={{nodes, replaceNodes, updateNode, focusNode, flushActiveText}}>
+        <EditorContext.Provider value={{nodes, replaceNodes, updateNode, focusNode, flushDirtyNodes, addDirtyNode}}>
             {children}
         </EditorContext.Provider>
     )
