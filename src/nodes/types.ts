@@ -6,6 +6,10 @@ export const NODE_TYPES = {
     TEXT: "text",
 } as const;
 
+export type RosetteNodeType = RosetteNode["type"];
+
+export type RosetteNodeOfType<T extends RosetteNodeType> = Extract<RosetteNode, { type: T}>;
+
 interface RosetteNodeBase<TType extends string> {
     id: string;
     type: TType;

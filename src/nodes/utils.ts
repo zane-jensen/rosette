@@ -1,6 +1,6 @@
 
 import { NodeRange } from "../types/NodeRange";
-import type { FindNodeResult, RosetteNode } from "./types";
+import type { FindNodeResult, RosetteNode, RosetteNodeOfType, RosetteNodeType } from "./types";
 
 
 export const getParentPath = (path: number[]) => path.slice(0, -1);
@@ -209,14 +209,12 @@ export const getNodeBefore = (nodes: RosetteNode[], targetNodeId: string): Roset
     }
 }
 
-export const findNodeOfType = (parentNode: RosetteNode, nodeType: string): RosetteNode | null => {
-    var targetNode = parentNode;
+export const findNodeOfType = <T extends RosetteNodeType>(parentNode: RosetteNode, nodeType: T): RosetteNodeOfType<T> | null => {
+    if (parentNode.type === nodeType) return parentNode as RosetteNodeOfType<T>;
 
-    if (targetNode.type === nodeType) return targetNode;
+    if (!("nodes" in parentNode)) return null;
 
-    if (!("nodes" in targetNode)) return null;
-
-    for (let node of [...targetNode.nodes].reverse()) {
+    for (let node of [...parentNode.nodes].reverse()) {
         const foundNode = findNodeOfType(node, nodeType);
         if (foundNode) return foundNode;
     }

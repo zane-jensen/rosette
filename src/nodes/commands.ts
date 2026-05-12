@@ -78,6 +78,8 @@ const insertAtText = (
             ]
         }
 
+        console.log("Wrapper Node", wrapperNode);
+
         // remove old focused node from dom
         let updatedNodes = deleteNodeById(nodes, targetNode.id);
         // add wrapped node with focused node into DOM in place

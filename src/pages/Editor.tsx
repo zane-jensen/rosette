@@ -3,7 +3,7 @@ import ToolbarButton from "../components/ToolbarButton";
 import { NODE_TYPES, type RosetteNode } from "../nodes/types";
 import { renderNode } from "../nodes/renderNode";
 import { createListItemNode, createOrderedListNode, createTextNode, createUnorderedListNode } from "../nodes/factories";
-import { deleteNodeById, findNodeById, findNodeOfType, getActiveElement, getActiveNode, getNodeAtPath, getNodeBefore, getParentPath, getSelectedNodes, insertNodeAfter, splitTextElement, updateNodeById } from "../nodes/utils";
+import { deleteNodeById, findNodeById, findNodeOfType, getActiveElement, getNodeAtPath, getNodeBefore, getParentPath, getSelectedNodes, insertNodeAfter, splitTextElement, updateNodeById } from "../nodes/utils";
 import { useEditor } from "../providers/editor/EditorProvider";
 import { deleteNode, insertToolbarNode } from "../nodes/commands";
 import { type KeyboardEvent } from "react";
@@ -19,13 +19,17 @@ const Editor = () => {
         const updatedNodes = insertToolbarNode(syncedNodes, node, element?.dataset.nodeId);
         replaceNodes(updatedNodes);
 
-        const newTextNode = findNodeOfType(node, NODE_TYPES.TEXT);
-        if (newTextNode) focusNode(newTextNode.id);
+        // you need to get the toolbarnode again, as the children may be stale at this time.
+        const targetToolbarNode = findNodeById(updatedNodes, node.id);
+        if (!targetToolbarNode) return;
+
+        const newTextNode = findNodeOfType(targetToolbarNode.node, NODE_TYPES.TEXT);
+        if (newTextNode) focusNode(newTextNode.id, newTextNode.content.length);
     }
 
     const blurHandler = () => {
-        const updatedNodes = flushDirtyNodes();
-        replaceNodes(updatedNodes);
+        const syncedNodes = flushDirtyNodes();
+        replaceNodes(syncedNodes);
     }
 
     const inputHandler = () => {
@@ -39,7 +43,7 @@ const Editor = () => {
         if (e.key == "Enter") {
             e.preventDefault();
 
-            const syncedNodes = flushDirtyNodes();
+            var syncedNodes = flushDirtyNodes();
             
             const element = getActiveElement();
             if (!element) return;
@@ -75,10 +79,10 @@ const Editor = () => {
                     const listNode = getNodeAtPath(syncedNodes, getParentPath(listItemTarget.nodePath))
                     if (!listNode) return;
                     
-                    let updatedNodes = insertNodeAfter(syncedNodes, listNode.id, newTextNode);
-                    updatedNodes = deleteNodeById(updatedNodes, listItemElementId);
-                    replaceNodes(updatedNodes);
-                    focusNode(newTextNode.id);
+                    syncedNodes = insertNodeAfter(syncedNodes, listNode.id, newTextNode);
+                    syncedNodes = deleteNodeById(syncedNodes, listItemElementId);
+                    replaceNodes(syncedNodes);
+                    focusNode(newTextNode.id, 0);
                     return;
                 }
                 
@@ -91,25 +95,26 @@ const Editor = () => {
                 newNodeParentId = elementNodeId;
             }
 
-            let updatedNodes = insertNodeAfter(syncedNodes, newNodeParentId, newNode);
-            updatedNodes = updateNodeById(updatedNodes, elementNodeId, {
+            syncedNodes = insertNodeAfter(syncedNodes, newNodeParentId, newNode);
+            syncedNodes = updateNodeById(syncedNodes, elementNodeId, {
                 ...node,
                 content: formerText
             });
 
-            replaceNodes(updatedNodes);
+            replaceNodes(syncedNodes);
             const childTextNode = findNodeOfType(newNode, NODE_TYPES.TEXT);
-            if (childTextNode) focusNode(childTextNode.id);
+            if (childTextNode) focusNode(childTextNode.id, 0);
             return;
         }
         
         if (e.key === "Backspace") {
-            const syncedNodes = flushDirtyNodes();
+            var syncedNodes = flushDirtyNodes();
 
             const selection = window.getSelection();
+            if (!selection || selection.rangeCount === 0) return;
 
             // if items are multi-selected / highlighted
-            if (selection && !selection.isCollapsed) {
+            if (!selection.isCollapsed) {
                 e.preventDefault();
                 
                 const range = getSelectedNodes(syncedNodes);
@@ -122,27 +127,72 @@ const Editor = () => {
                 replaceNodes(updatedNodes.length !== 0 ? updatedNodes : [createTextNode()]);
             }
 
-            let target = getActiveNode(syncedNodes);
+            let element = getActiveElement();
+            console.log(element);
+            if (!element) return;
+
+            let target = findNodeById(syncedNodes, element.dataset.nodeId!);
             if (!target) return;
 
-            let {node} = target;
+            let {node, nodePath} = target;
 
             if (node.type !== NODE_TYPES.TEXT) return;
+            
+            const range = selection.getRangeAt(0);
 
-            // if text is empty
-            if (node.content === "") {
+            // if line is at the start
+            if (range.startOffset === 0) {
                 e.preventDefault();
 
                 const nodeBefore = getNodeBefore(syncedNodes, node.id);
                 if (!nodeBefore) return;
 
-                const updatedNodes = deleteNode(syncedNodes, node.id);
-                replaceNodes(updatedNodes);
+                const parentPath = getParentPath(nodePath);
+                const parent = getNodeAtPath(syncedNodes, parentPath);
 
+                var newTextNode;
+                // if node has no other text nodes before it (last node)
                 const textNodeBefore = findNodeOfType(nodeBefore, NODE_TYPES.TEXT);
-                if (!textNodeBefore) return;
-                
-                focusNode(textNodeBefore.id);
+                if (!textNodeBefore) {
+                    syncedNodes = updateNodeById(syncedNodes, node.id, {
+                        ...node,
+                        content: ""
+                    });
+
+                    replaceNodes(syncedNodes);
+                    focusNode(node.id, 0);
+                    return;
+                }
+
+                var focusedNodeId;
+                var focusOffset;
+
+                // if text node is the first element in a list
+                if (parent && parent.type === NODE_TYPES.LIST_ITEM && parentPath[parentPath.length - 1] === 0) {
+                    newTextNode = createTextNode(node.content);
+                    syncedNodes = insertNodeAfter(syncedNodes, nodeBefore.id, newTextNode);
+                    
+                    focusedNodeId = newTextNode.id;
+                }
+
+                // if deleted node has content left in it
+                if (node.content) {
+                    syncedNodes = updateNodeById(syncedNodes, textNodeBefore.id, {
+                        ...textNodeBefore,
+                        content: textNodeBefore.content + node.content
+                    });
+
+                    focusedNodeId = textNodeBefore.id;
+                    focusOffset = textNodeBefore.content.length;
+                }
+
+                syncedNodes = deleteNode(syncedNodes, node.id);
+                replaceNodes(syncedNodes);
+
+                focusedNodeId = focusedNodeId || textNodeBefore.id;
+                focusOffset = focusOffset || textNodeBefore.content.length;
+                console.log(focusedNodeId, focusOffset);
+                focusNode(focusedNodeId, focusOffset);
             }
         }
     }
@@ -159,6 +209,7 @@ const Editor = () => {
                 onBlur={blurHandler} 
                 onInput={inputHandler}
                 onKeyDown={keyDownHandler} 
+                onSelect={inputHandler}
                 >
                     {nodes.map((n: RosetteNode) => renderNode(n))}
                 </div>

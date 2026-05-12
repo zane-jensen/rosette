@@ -7,7 +7,7 @@ interface EditorContextValue {
     nodes: RosetteNode[];
     replaceNodes: (updatedNodes: RosetteNode[]) => void;
     updateNode: (node: RosetteNode) => RosetteNode[];
-    focusNode: (nodeId: string) => void;
+    focusNode: (nodeId: string, offset?: number) => void;
     flushDirtyNodes: () => RosetteNode[];
     addDirtyNode: (nodeId: string) => void;
 }
@@ -21,7 +21,7 @@ export const useEditor = () => {
 }
 
 export const EditorProvider = ({children}: {children: ReactNode}) => {
-    const [focusNextId, setFocusNextId] = useState<string | null>(null);
+    const [focusNext, setFocusNext] = useState<{nodeId: string, offset: number}>({nodeId: "", offset: 0});
     const dirtyNodeIdsRef = useRef<Set<string>>(new Set());
 
     const [nodes, setNodes] = useState<RosetteNode[]>([
@@ -71,13 +71,13 @@ export const EditorProvider = ({children}: {children: ReactNode}) => {
         for (let nodeId of dirtyNodeIdsRef.current) {
             const element = document.querySelector(`[data-node-id="${nodeId}"]`);
             const target = findNodeById(pendingNodes, nodeId);
-            if (!target || !element) continue;
+            if (!target) continue;
 
             if (target.node.type !== NODE_TYPES.TEXT) continue;
 
             const updatedNode = {
                 ...target.node,
-                content: element.textContent
+                content: element?.textContent ?? ""
             }
 
             pendingNodes = updateNodeById(pendingNodes, nodeId, updatedNode);
@@ -91,36 +91,47 @@ export const EditorProvider = ({children}: {children: ReactNode}) => {
         dirtyNodeIdsRef.current.add(nodeId);
     }
 
-    const focusNode = (nodeId: string) => {
-        setFocusNextId(nodeId);
+    const focusNode = (nodeId: string, offset: number = 0) => {
+        setFocusNext({nodeId, offset});
+    }
+
+    const clearFocusNext = () => {
+        setFocusNext({nodeId: "", offset: 0});
     }
 
     useEffect(() => {
-        if (!focusNextId) return;
+        if (!focusNext) return;
 
-        const focusedNode = findNodeById(nodes, focusNextId);
+        const focusedNode = findNodeById(nodes, focusNext.nodeId);
+        console.log("Focused: ", focusedNode);
         if (!focusedNode) return;
 
         const element = document.querySelector(
-            `[data-node-id="${focusNextId}"]`
+            `[data-node-id="${focusNext.nodeId}"]`
         ) as HTMLElement | null;
 
         if (!element) return;
 
         element.focus();
 
+        const elementNode = element?.firstChild;
+
         const selection = window.getSelection();
         const range = document.createRange();
-
-        range.selectNodeContents(element);
-        range.collapse(true);
+        if (elementNode) {
+            range.setStart(elementNode, focusNext.offset);
+            range.setEnd(elementNode, focusNext.offset);
+        }
+        else {
+            range.setStart(element, 0);
+            range.setEnd(element, 0);
+        }
 
         selection?.removeAllRanges();
         selection?.addRange(range);
+        clearFocusNext();
 
-        setFocusNextId(null);
-
-    }, [nodes, focusNextId])
+    }, [nodes, focusNext])
 
     return (
         <EditorContext.Provider value={{nodes, replaceNodes, updateNode, focusNode, flushDirtyNodes, addDirtyNode}}>
