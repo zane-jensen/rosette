@@ -103,7 +103,6 @@ export const EditorProvider = ({children}: {children: ReactNode}) => {
         if (!focusNext) return;
 
         const focusedNode = findNodeById(nodes, focusNext.nodeId);
-        console.log("Focused: ", focusedNode);
         if (!focusedNode) return;
 
         const element = document.querySelector(

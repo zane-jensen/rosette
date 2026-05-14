@@ -3,7 +3,7 @@ import { NodeRange } from "../types/NodeRange";
 import type { FindNodeResult, RosetteNode, RosetteNodeOfType, RosetteNodeType } from "./types";
 
 
-export const getParentPath = (path: number[]) => path.slice(0, -1);
+export const getParentPath = (path: number[], generation: number = 1) => path.slice(0, -generation);
 
 export const getActiveElement = () => {
     const selection = window.getSelection();
@@ -189,7 +189,7 @@ export const insertNodeAfter = (nodes: RosetteNode[], targetNodeId: string, newN
 }
 
 
-export const getNodeBefore = (nodes: RosetteNode[], targetNodeId: string): RosetteNode | null => {
+export const getNodeBefore = (nodes: RosetteNode[], targetNodeId: string): FindNodeResult | null => {
     var target = findNodeById(nodes, targetNodeId);
     if (!target) return null
 
@@ -198,14 +198,23 @@ export const getNodeBefore = (nodes: RosetteNode[], targetNodeId: string): Roset
         const parent = getNodeAtPath(nodes, parentPath);
         const targetOrder = target.nodePath[target.nodePath.length - 1];
 
-        if (!parent || !("nodes" in parent)) return nodes[targetOrder - 1];
+        if (!parent || !("nodes" in parent)) {
+            return {
+                node: nodes[targetOrder - 1],
+                nodePath: target.nodePath
+            }
+            
+        }
 
         if (targetOrder === 0) {
             target = {node: parent, nodePath: parentPath}
             continue;
         }
 
-        return parent.nodes[targetOrder - 1];
+        return {
+            node: parent.nodes[targetOrder - 1],
+            nodePath: target.nodePath
+        };
     }
 }
 
@@ -243,6 +252,12 @@ export const getNodesFromNodePath = (nodes: RosetteNode[], nodePath: number[]) =
 }
 
 
+/**
+ * Don't use in components, use deleteNode command instead
+ * @param nodes 
+ * @param nodeId 
+ * @returns 
+ */
 export const deleteNodeById = (nodes: RosetteNode[], nodeId: string) => {
     const target = findNodeById(nodes, nodeId);
 

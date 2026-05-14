@@ -81,10 +81,13 @@ const insertAtText = (
         console.log("Wrapper Node", wrapperNode);
 
         // remove old focused node from dom
-        let updatedNodes = deleteNodeById(nodes, targetNode.id);
+        let updatedNodes = deleteNode(nodes, targetNode.id);
         // add wrapped node with focused node into DOM in place
         updatedNodes = insertNodeAtPath(updatedNodes, wrapperNode, targetNodePath);
         return updatedNodes;
+    }
+    else if (target.node.type === NODE_TYPES.TEXT && target.node.content === "" && target.nodePath.length > 1) {
+        return nodes;
     }
     
     // get parent
