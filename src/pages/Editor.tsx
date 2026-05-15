@@ -354,7 +354,7 @@ const Editor = () => {
                     />
                 </div>
             </div>
-            {true && <pre className='absolute top-[100%] left-0'>{JSON.stringify(nodes, null, 2)}</pre>}
+            {false && <pre className='absolute top-[100%] left-0'>{JSON.stringify(nodes, null, 2)}</pre>}
         </Panel>
     )
 }
