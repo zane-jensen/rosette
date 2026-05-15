@@ -25,7 +25,6 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name: "Rosette",
-      fileName: "rich-editor",
       formats: ["es"]
     },
 
@@ -37,7 +36,7 @@ export default defineConfig({
       ],
       output: {
         format: "es",
-        entryFileNames: 'rich-editor.js'
+        entryFileNames: "index.js"
       }
     }
   }
