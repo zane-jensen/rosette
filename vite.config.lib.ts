@@ -26,16 +26,15 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/index.ts'),
       name: "Rosette",
       fileName: "rich-editor",
+      formats: ["es"]
     },
-    
+
     rolldownOptions: {
-      external: ["react", "react-dom"],
-      output: {
-        globals: {
-          react: 'React',
-          'react-dom': "ReactDOM"
-        }
-      }
+      external: [
+        'react',
+        'react-dom',
+        'react/jsx-runtime'
+      ]
     }
   }
 })
