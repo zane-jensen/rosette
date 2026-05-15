@@ -2,8 +2,8 @@ import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import babel from '@rolldown/plugin-babel'
-import path from 'path'
-import dts from "vite-plugin-dts";
+import { resolve } from 'path'
+import dts from "vite-plugin-dts"
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -11,18 +11,31 @@ export default defineConfig({
     react(),
     babel({ presets: [reactCompilerPreset()] }),
     tailwindcss(),
-    dts({insertTypesEntry: true})
+    dts({
+      tsconfigPath: "./tsconfig.lib.json",
+      insertTypesEntry: true,
+      afterBuild: () => {
+        console.log("Types bundled!")
+      }
+    })
   ],
 
   build: {
+    emptyOutDir: false,
     lib: {
-      entry: path.resolve(__dirname, "src/index.ts"),
-      formats: ["es"],
-      fileName: "rich-editor"
+      entry: resolve(__dirname, 'src/index.ts'),
+      name: "Rosette",
+      fileName: "rich-editor",
     },
     
     rolldownOptions: {
-      external: ["react", "react-dom", "react/jsx-runtime"]
+      external: ["react", "react-dom"],
+      output: {
+        globals: {
+          react: 'React',
+          'react-dom': "ReactDOM"
+        }
+      }
     }
   }
 })
