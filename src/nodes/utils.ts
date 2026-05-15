@@ -218,12 +218,17 @@ export const getNodeBefore = (nodes: RosetteNode[], targetNodeId: string): FindN
     }
 }
 
-export const findNodeOfType = <T extends RosetteNodeType>(parentNode: RosetteNode, nodeType: T): RosetteNodeOfType<T> | null => {
-    if (parentNode.type === nodeType) return parentNode as RosetteNodeOfType<T>;
+export const findNodeOfType = <T extends RosetteNodeType >(targetNode: RosetteNode, nodeType: T | readonly T[]): RosetteNodeOfType<T> | null => {
+    if (Array.isArray(nodeType) && nodeType.includes(targetNode.type)) {
+        return targetNode as RosetteNodeOfType<T>;
+    }
+    else if (typeof nodeType === "string" && nodeType === targetNode.type) {
+        return targetNode as RosetteNodeOfType<T>;
+    }
 
-    if (!("nodes" in parentNode)) return null;
+    if (!("nodes" in targetNode)) return null;
 
-    for (let node of [...parentNode.nodes].reverse()) {
+    for (let node of [...targetNode.nodes].reverse()) {
         const foundNode = findNodeOfType(node, nodeType);
         if (foundNode) return foundNode;
     }
