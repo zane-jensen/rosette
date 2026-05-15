@@ -1,15 +1,15 @@
-import Panel from "../components/Panel";
-import ToolbarButton from "../components/ToolbarButton";
+import Panel from "./Panel";
+import ToolbarButton from "./ToolbarButton";
 import { NODE_TYPES, type OrderedListNode, type RosetteNode, type UnorderedListNode } from "../nodes/types";
 import { renderNode } from "../nodes/renderNode";
 import { createListItemNode, createOrderedListNode, createTextNode, createUnorderedListNode } from "../nodes/factories";
 import { findNodeById, findNodeOfType, getActiveElement, getActiveNode, getNodeAtPath, getNodeBefore, getParentPath, insertNodeAfter, splitTextElement, updateNodeById } from "../nodes/utils";
-import { useEditor } from "../providers/editor/EditorProvider";
+import { EditorProvider, useEditor } from "../providers/editor/EditorProvider";
 import { deleteNode, insertToolbarNode } from "../nodes/commands";
 import { useEffect, useRef, type KeyboardEvent } from "react";
 
 
-const Editor = () => {
+const EditorInner = () => {
     const {nodes, replaceNodes, focusNode} = useEditor();
     const editorRef = useRef<HTMLDivElement>(null);
 
@@ -326,7 +326,7 @@ const Editor = () => {
     return (
         <Panel>
             <div className="flex flex-col gap-4 min-w-125 max-w-150">
-                <p>Editor</p>
+                <p>Rosette</p>
 
                 <div
                 className="flex flex-col items-start bg-(--color-dark-slate) p-4 inset-shadow-md whitespace-pre-wrap"
@@ -358,5 +358,16 @@ const Editor = () => {
         </Panel>
     )
 }
+
+
+const Editor = () => {
+    return (
+        <EditorProvider>
+            <EditorInner />
+        </EditorProvider>
+    )
+}
+
+
 
 export default Editor;

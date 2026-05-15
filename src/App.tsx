@@ -1,12 +1,12 @@
 import './App.css'
-import Editor from './pages/Editor'
+import EditorInner from './components/Editor'
 
 function App() {
 
   return (
     <div className='flex flex-col items-center w-full h-screen justify-center'>
         <div className='flex flex-col items-center justify-center h-full'>
-          <Editor/>
+          <EditorInner/>
         </div>
     </div>
   )

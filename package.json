@@ -1,26 +1,36 @@
 {
-  "name": "rosette",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@rosette/rich-editor",
+  "private": false,
+  "version": "0.1.0",
   "type": "module",
+
+  "exports": {
+    ".": {
+      "import": "./dist/rich-editor.js",
+      "types": "./dist/rich-editor.d.ts"
+    }
+  },
+
+  "files": [
+    "dist"
+  ],
+
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepare": "npm run build"
   },
-  "dependencies": {
-    "@tailwindcss/vite": "^4.2.4",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
-    "tailwindcss": "^4.2.4"
-  },
+
   "devDependencies": {
     "@babel/core": "^7.29.0",
     "@eslint/js": "^10.0.1",
     "@rolldown/plugin-babel": "^0.2.3",
     "@types/babel__core": "^7.20.5",
     "@types/node": "^24.12.2",
+    "react": "^19.2.5",
+    "react-dom": "19.2.5",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
@@ -31,6 +41,14 @@
     "globals": "^17.5.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
-    "vite": "^8.0.10"
+    "vite": "^8.0.10",
+    "vite-plugin-dts": "^5.0.0",
+    "@tailwindcss/vite": "^4.2.4",
+    "tailwindcss": "^4.2.4"
+  },
+  
+  "peerDependencies": {
+    "react": "^19",
+    "react-dom": "^19"
   }
 }

@@ -1,0 +1,1 @@
+export {default as EditorInner} from "./components/Editor";
