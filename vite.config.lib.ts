@@ -34,7 +34,11 @@ export default defineConfig({
         'react',
         'react-dom',
         'react/jsx-runtime'
-      ]
+      ],
+      output: {
+        format: "es",
+        entryFileNames: '[name].js'
+      }
     }
   }
 })
