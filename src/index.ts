@@ -3,6 +3,9 @@
 // editor
 export {default as Editor} from "./components/Editor/Editor";
 
+// utils
+export {renderNode} from "./nodes/renderNode";
+
 // factories
 export {
     createTextNode,
