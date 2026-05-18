@@ -1,2 +1,1 @@
-import "./index.css";
-export {default as Editor} from "./components/Editor";
+export {default as Editor} from "./components/Editor/Editor";

@@ -1,12 +1,13 @@
-import Panel from "./Panel";
-import ToolbarButton from "./ToolbarButton";
-import { NODE_TYPES, type OrderedListNode, type RosetteNode, type UnorderedListNode } from "../nodes/types";
-import { renderNode } from "../nodes/renderNode";
-import { createListItemNode, createOrderedListNode, createTextNode, createUnorderedListNode } from "../nodes/factories";
-import { findNodeById, findNodeOfType, getActiveElement, getActiveNode, getNodeAtPath, getNodeBefore, getParentPath, insertNodeAfter, splitTextElement, updateNodeById } from "../nodes/utils";
-import { EditorProvider, useEditor } from "../providers/editor/EditorProvider";
-import { deleteNode, insertToolbarNode } from "../nodes/commands";
+import Panel from "../Panel";
+import ToolbarButton from "../ToolbarButton";
+import { NODE_TYPES, type OrderedListNode, type RosetteNode, type UnorderedListNode } from "../../nodes/types";
+import { renderNode } from "../../nodes/renderNode";
+import { createListItemNode, createOrderedListNode, createTextNode, createUnorderedListNode } from "../../nodes/factories";
+import { findNodeById, findNodeOfType, getActiveElement, getActiveNode, getNodeAtPath, getNodeBefore, getParentPath, insertNodeAfter, splitTextElement, updateNodeById } from "../../nodes/utils";
+import { EditorProvider, useEditor } from "../../providers/editor/EditorProvider";
+import { deleteNode, insertToolbarNode } from "../../nodes/commands";
 import { useEffect, useRef, type KeyboardEvent } from "react";
+import "./editor.css";
 
 
 const EditorInner = () => {
@@ -325,7 +326,7 @@ const EditorInner = () => {
 
     return (
         <Panel>
-            <div className="flex flex-col gap-4 min-w-125 max-w-150">
+            <div className="flex flex-col gap-4">
                 <p>Rosette</p>
 
                 <div
