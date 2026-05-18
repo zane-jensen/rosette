@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
-import react, { reactCompilerPreset } from '@vitejs/plugin-react'
+import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 import dts from "vite-plugin-dts"
 
@@ -23,6 +23,7 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name: "Rosette",
+      fileName: "rich-editor",
       formats: ["es"]
     },
 
@@ -34,7 +35,7 @@ export default defineConfig({
       ],
       output: {
         format: "es",
-        entryFileNames: "index.js"
+        entryFileNames: "rich-editor.js"
       }
     }
   }

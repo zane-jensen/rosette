@@ -5,9 +5,10 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
+      "import": "./dist/rich-editor.js",
       "types": "./dist/index.d.ts"
-    }
+    },
+    "./style.css": "./dist/rich-editor.css"
   },
   "files": [
     "dist"
