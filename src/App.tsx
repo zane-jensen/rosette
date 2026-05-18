@@ -37,7 +37,7 @@ function App() {
   return (
     <div className='flex flex-col items-center w-full h-screen justify-center'>
         <div className='flex flex-col items-center justify-center h-full max-w-150'>
-          <Editor defaultValue={defaultValue}/>
+          <Editor defaultValue={defaultValue} className='w-200'/>
         </div>
     </div>
   )

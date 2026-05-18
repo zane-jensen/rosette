@@ -12,10 +12,11 @@ import "./editor.css";
 interface EditorProps {
     defaultValue?: RosetteNode[];
     onChange?: (nodes: RosetteNode[]) => null;
+    className?: string;
 }
 
 
-const EditorInner = () => {
+const EditorInner = ({className}: {className?: string}) => {
     const {nodes, replaceNodes, focusNode} = useEditor();
     const editorRef = useRef<HTMLDivElement>(null);
 
@@ -330,45 +331,42 @@ const EditorInner = () => {
     }
 
     return (
-        <div className="w-full flex flex-row gap-2">
-            <Panel>
-                <div className="flex flex-col gap-4 min-w-100">
-                    <p>Rosette</p>
-                    <div
-                    className="flex flex-col items-start bg-(--color-dark-slate) p-4 inset-shadow-md whitespace-pre-wrap"
-                    contentEditable
-                    suppressContentEditableWarning
-                    ref={editorRef}
-                    onKeyDown={keyDownHandler}
-                    onPaste={(e) => e.preventDefault()}
-                    >
-                        {nodes.map((n: RosetteNode) => renderNode(n))}
-                    </div>
-                    {/** Toolbar */}
-                    <div className="flex gap-4">
-                        <ToolbarButton
-                            buttonText="OL"
-                            node={createOrderedListNode}
-                            onClick={toolbarHandler}
-                        />
-                        <ToolbarButton
-                            buttonText="UL"
-                            node={createUnorderedListNode}
-                            onClick={toolbarHandler}
-                        />
-                    </div>
+        <Panel className={className}>
+            <div className="flex flex-col gap-4 w-full">
+                <p>Rosette</p>
+                <div
+                className="flex flex-col items-start bg-(--color-dark-slate) p-4 inset-shadow-md whitespace-pre-wrap w-full"
+                contentEditable
+                suppressContentEditableWarning
+                ref={editorRef}
+                onKeyDown={keyDownHandler}
+                onPaste={(e) => e.preventDefault()}
+                >
+                    {nodes.map((n: RosetteNode) => renderNode(n))}
                 </div>
-            </Panel>
-            {false && <pre className="max-h-20">{JSON.stringify(nodes, null, 2)}</pre>}
-        </div>
+                {/** Toolbar */}
+                <div className="flex gap-4">
+                    <ToolbarButton
+                        buttonText="OL"
+                        node={createOrderedListNode}
+                        onClick={toolbarHandler}
+                    />
+                    <ToolbarButton
+                        buttonText="UL"
+                        node={createUnorderedListNode}
+                        onClick={toolbarHandler}
+                    />
+                </div>
+            </div>
+        </Panel>
     )
 }
 
 
-const Editor = ({defaultValue, onChange}: EditorProps) => {
+const Editor = ({defaultValue, className, onChange}: EditorProps) => {
     return (
         <EditorProvider defaultValue={defaultValue} onChange={onChange}>
-            <EditorInner />
+            <EditorInner className={className} />
         </EditorProvider>
     )
 }

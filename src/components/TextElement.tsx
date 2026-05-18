@@ -10,7 +10,7 @@ const TextElement = ({node}: ITextElement) => {
     return (
         <p data-node-id={node.id} 
              data-node-type={node.type}
-             className="outline-none w-full min-h-[1em]"
+             className="outline-none w-full min-h-[1em] wrap-anywhere"
         >{node.content}</p>
     )
 }
