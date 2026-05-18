@@ -5,6 +5,7 @@ export {default as Editor} from "./components/Editor/Editor";
 
 // utils
 export {renderNode} from "./nodes/renderNode";
+export {convertFromRicosDocument} from "./nodes/ricos";
 
 // factories
 export {

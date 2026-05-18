@@ -1,15 +1,7 @@
-import {TEST_RICOS_CONTENT} from "../../public/ricos-sample";
+
 import type { RicosDocument, RicosNode } from "../types/Ricos";
 import { createListItemNode, createOrderedListNode, createTextNode, createUnorderedListNode } from "./factories";
 import type { RosetteNode } from "./types";
-
-
-
-export const testRicosConversion = () => {
-    const nodes = convertFromRicosDocument(TEST_RICOS_CONTENT);
-
-    return nodes;
-}
 
 export const convertFromRicosDocument = (doc: RicosDocument): RosetteNode[] => {
     var nodes: RosetteNode[] = [];
