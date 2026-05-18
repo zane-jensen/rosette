@@ -11,7 +11,7 @@ import "./editor.css";
 
 interface EditorProps {
     defaultValue?: RosetteNode[];
-    onChange?: (nodes: RosetteNode[]) => null;
+    onChange?: (nodes: RosetteNode[]) => void;
     className?: string;
 }
 
