@@ -20,7 +20,7 @@ export const deleteNode = (
 
         // if this is the last list item in the list, delete the list instead.
         const parentList = getNodeAtPath(nodes, getParentPath(parentPath));
-        if (parentList && "nodes" in parentList && parentList.nodes.length <= 1) {
+        if (parentList && parentList.nodes && parentList.nodes.length <= 1) {
             deletedNodeId = parentList.id;
         }
 

@@ -29,7 +29,7 @@ export const getNodeAtPath = (nodes: RosetteNode[], path: number[]) => {
         currentNode = currentNodes[index];
         if (!currentNode) return null;
 
-        if ("nodes" in currentNode) {
+        if (currentNode.nodes) {
             currentNodes = currentNode.nodes;
         }
     }
@@ -122,7 +122,7 @@ export const findNodeById = (nodes: RosetteNode[], id: string, nodePath: number[
             nodePath: localNodePath
         }; // found!
 
-        if ("nodes" in node) { // if there are child nodes recurse
+        if (node.nodes) { // if there are child nodes recurse
             const found = findNodeById(node.nodes, id, localNodePath);
             if (found) return found;
         }
@@ -139,7 +139,7 @@ export const updateNodeById = (nodes: RosetteNode[], id: string, updatedNode: Ro
             return updatedNode
         }
 
-        if ("nodes" in node) {
+        if (node.nodes) {
             return {
                 ...node,
                 nodes: updateNodeById(node.nodes, id, updatedNode)
@@ -157,7 +157,7 @@ export const insertNodeAtPath = (nodes: RosetteNode[], node: RosetteNode, nodePa
         return [...nodes.slice(0, nodePath[0]), node, ...nodes.slice(nodePath[0])]
     }
     
-    if ("nodes" in parentNode) {
+    if (parentNode.nodes) {
         const updatedNode = {
             ...parentNode,
             nodes: [...parentNode.nodes, node]
@@ -175,7 +175,7 @@ export const insertNodeAfter = (nodes: RosetteNode[], targetNodeId: string, newN
     if (!target) return nodes;
 
     const parent = getNodeAtPath(nodes, getParentPath(target.nodePath));
-    if (!parent || !("nodes" in parent)) {
+    if (!parent || !parent.nodes) {
         return [...nodes.slice(0, target.nodePath[0] + 1), newNode, ...nodes.slice(target.nodePath[0] + 1)];
     }
 
@@ -198,7 +198,7 @@ export const getNodeBefore = (nodes: RosetteNode[], targetNodeId: string): FindN
         const parent = getNodeAtPath(nodes, parentPath);
         const targetOrder = target.nodePath[target.nodePath.length - 1];
 
-        if (!parent || !("nodes" in parent)) {
+        if (!parent || !parent.nodes) {
             return {
                 node: nodes[targetOrder - 1],
                 nodePath: target.nodePath
@@ -226,7 +226,7 @@ export const findNodeOfType = <T extends RosetteNodeType >(targetNode: RosetteNo
         return targetNode as RosetteNodeOfType<T>;
     }
 
-    if (!("nodes" in targetNode)) return null;
+    if (!targetNode.nodes) return null;
 
     for (let node of [...targetNode.nodes].reverse()) {
         const foundNode = findNodeOfType(node, nodeType);
@@ -248,7 +248,7 @@ export const getNodesFromNodePath = (nodes: RosetteNode[], nodePath: number[]) =
 
         foundNodes.push(currentNode);
 
-        if (!("nodes" in currentNode)) return foundNodes;
+        if (!currentNode.nodes) return foundNodes;
 
         currentNodes = currentNode.nodes;
     }
@@ -281,7 +281,7 @@ export const deleteNodeById = (nodes: RosetteNode[], nodeId: string) => {
     // if node has parent
     else {
         const parent = getNodeAtPath(nodes, getParentPath(nodePath));
-        if (!parent || !("nodes" in parent)) {
+        if (!parent || !parent.nodes) {
             throw new Error("Node path length > 1 but has no parent");
         }
 

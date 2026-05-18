@@ -288,7 +288,7 @@ const EditorInner = ({className}: {className?: string}) => {
                 if (listParentNode?.type !== NODE_TYPES.LIST_ITEM) return;
 
                 const newParentList = getNodeAtPath(syncedNodes, getParentPath(listNodePath, 2));
-                if (!newParentList || !("nodes" in newParentList)) return;
+                if (!newParentList || !newParentList.nodes) return;
                 newParentNode = newParentList;
                 
                 shiftedNode = {...parentNode};
@@ -335,7 +335,7 @@ const EditorInner = ({className}: {className?: string}) => {
             <div className="flex flex-col gap-4 w-full">
                 <p>Rosette</p>
                 <div
-                className="flex flex-col items-start bg-(--color-dark-slate) p-4 inset-shadow-md whitespace-pre-wrap w-full"
+                className="flex flex-col gap-2 items-start bg-(--color-dark-slate) p-4 inset-shadow-md whitespace-pre-wrap w-full max-h-200 overflow-scroll"
                 contentEditable
                 suppressContentEditableWarning
                 ref={editorRef}

@@ -1,0 +1,1264 @@
+{
+    "documentStyle": {},
+    "nodes": [
+        {
+            "fileData": {
+                "name": "2026-04-01 - Release Notes.pdf",
+                "size": 1607832,
+                "sizeInKb": "1608",
+                "src": {
+                    "id": "ugd/97ce51_903a888503ce4d34826d9f6735fd25b9.pdf",
+                    "private": false
+                },
+                "type": "pdf"
+            },
+            "id": "zuco3470",
+            "nodes": [],
+            "type": "FILE"
+        },
+        {
+            "style": {},
+            "id": "hv0a5737",
+            "nodes": [
+                {
+                    "id": "",
+                    "nodes": [],
+                    "textData": {
+                        "decorations": [
+                            {
+                                "fontWeightValue": 400,
+                                "type": "BOLD"
+                            },
+                            {
+                                "colorData": {
+                                    "foreground": "#05E5AF"
+                                },
+                                "type": "COLOR"
+                            }
+                        ],
+                        "text": "Enhancements"
+                    },
+                    "type": "TEXT"
+                }
+            ],
+            "headingData": {
+                "level": 3,
+                "textStyle": {
+                    "textAlignment": "LEFT"
+                }
+            },
+            "type": "HEADING"
+        },
+        {
+            "paragraphData": {
+                "textStyle": {
+                    "textAlignment": "LEFT"
+                }
+            },
+            "style": {},
+            "id": "7z8m5951",
+            "nodes": [
+                {
+                    "id": "",
+                    "nodes": [],
+                    "textData": {
+                        "decorations": [
+                            {
+                                "fontWeightValue": 700,
+                                "type": "BOLD"
+                            },
+                            {
+                                "colorData": {
+                                    "foreground": "#FA854F"
+                                },
+                                "type": "COLOR"
+                            }
+                        ],
+                        "text": "Bread Pay Financing Enabled in TG (Released 3/25)"
+                    },
+                    "type": "TEXT"
+                }
+            ],
+            "type": "PARAGRAPH"
+        },
+        {
+            "bulletedListData": {
+                "indentation": 0
+            },
+            "id": "omak2977",
+            "nodes": [
+                {
+                    "id": "uz9nb978",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "qrflx964",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "Previously, Bread Pay was not enabled as a prequalification option in TechGenie."
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                },
+                {
+                    "id": "rh9e9990",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "1zmze966",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "This change enables Bread as an option, allowing for more financing options during sales."
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                },
+                {
+                    "id": "6r4gi1002",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "zj6k0968",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "As a reminder, the names of our finance providers should not be mentioned to customers during the prequalification process."
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                }
+            ],
+            "type": "BULLETED_LIST"
+        },
+        {
+            "id": "0ks7s1031",
+            "imageData": {
+                "containerData": {
+                    "alignment": "LEFT",
+                    "textWrap": false,
+                    "width": {
+                        "size": "SMALL"
+                    }
+                },
+                "image": {
+                    "height": 1227,
+                    "src": {
+                        "id": "97ce51_9b15b10fa6104fcbbc718a6fe2758c72~mv2.png"
+                    },
+                    "width": 1227
+                }
+            },
+            "nodes": [],
+            "type": "IMAGE"
+        },
+        {
+            "paragraphData": {
+                "textStyle": {
+                    "textAlignment": "LEFT"
+                }
+            },
+            "style": {},
+            "id": "0x2eu1341",
+            "nodes": [
+                {
+                    "id": "",
+                    "nodes": [],
+                    "textData": {
+                        "decorations": [
+                            {
+                                "fontWeightValue": 700,
+                                "type": "BOLD"
+                            },
+                            {
+                                "colorData": {
+                                    "foreground": "#FA854F"
+                                },
+                                "type": "COLOR"
+                            }
+                        ],
+                        "text": "Order Summary Showing Negative Due at Install Amount"
+                    },
+                    "type": "TEXT"
+                }
+            ],
+            "type": "PARAGRAPH"
+        },
+        {
+            "bulletedListData": {
+                "indentation": 0
+            },
+            "id": "87syd1394",
+            "nodes": [
+                {
+                    "id": "rqssw1395",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "1cx231376",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "Previously, if a customer made a payment that was greater than the Due at Install amount, TechGenie would display a negative amount. This made it seem as though a credit was owed, leading to misrepresentation and a poor experience for customers and pros."
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                },
+                {
+                    "id": "62j311413",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "nkvgo1378",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "The Due at install now has a minimum of $0. This means it will no longer be possible for Order Summary to show negative Due at Install amounts regardless of prior payments taken."
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                }
+            ],
+            "type": "BULLETED_LIST"
+        },
+        {
+            "id": "erc291459",
+            "imageData": {
+                "containerData": {
+                    "alignment": "LEFT",
+                    "textWrap": false,
+                    "width": {
+                        "size": "SMALL"
+                    }
+                },
+                "image": {
+                    "height": 1227,
+                    "src": {
+                        "id": "97ce51_b650aa524c744320ba6405567dfec285~mv2.png"
+                    },
+                    "width": 1227
+                }
+            },
+            "nodes": [],
+            "type": "IMAGE"
+        },
+        {
+            "paragraphData": {
+                "textStyle": {
+                    "textAlignment": "LEFT"
+                }
+            },
+            "style": {},
+            "id": "saavl1676",
+            "nodes": [
+                {
+                    "id": "",
+                    "nodes": [],
+                    "textData": {
+                        "decorations": [
+                            {
+                                "fontWeightValue": 700,
+                                "type": "BOLD"
+                            },
+                            {
+                                "colorData": {
+                                    "foreground": "#FA854F"
+                                },
+                                "type": "COLOR"
+                            }
+                        ],
+                        "text": "Discontinuation of IOS 17 Support"
+                    },
+                    "type": "TEXT"
+                }
+            ],
+            "type": "PARAGRAPH"
+        },
+        {
+            "bulletedListData": {
+                "indentation": 0
+            },
+            "id": "k87s11758",
+            "nodes": [
+                {
+                    "id": "j7nky1759",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "kgaqn1728",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "In Preparation for support of IOS 26 in TechGenie, IOS 17 support was dropped March 17"
+                                    },
+                                    "type": "TEXT"
+                                },
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [
+                                            {
+                                                "type": "SUPERSCRIPT"
+                                            }
+                                        ],
+                                        "text": "th"
+                                    },
+                                    "type": "TEXT"
+                                },
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": ". Going forward, TechGenie will only support IOS versions 18+ or newer."
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                },
+                {
+                    "id": "nly7j1791",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "slx9x1732",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "If a device does not support IOS 18 or newer, or there are any issues upgrading IOS on a company device, we recommend reaching out to "
+                                    },
+                                    "type": "TEXT"
+                                },
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [
+                                            {
+                                                "linkData": {
+                                                    "link": {
+                                                        "rel": {
+                                                            "noreferrer": true
+                                                        },
+                                                        "target": "BLANK",
+                                                        "url": "mailto:CellPhoneSupport@Vivint.com"
+                                                    }
+                                                },
+                                                "type": "LINK"
+                                            }
+                                        ],
+                                        "text": "CellPhoneSupport@Vivint.com"
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                }
+            ],
+            "type": "BULLETED_LIST"
+        },
+        {
+            "id": "lbmjf1885",
+            "imageData": {
+                "containerData": {
+                    "alignment": "LEFT",
+                    "textWrap": false,
+                    "width": {
+                        "size": "SMALL"
+                    }
+                },
+                "image": {
+                    "height": 1227,
+                    "src": {
+                        "id": "97ce51_7cac4eba70f146fdb6568d998076b131~mv2.png"
+                    },
+                    "width": 1227
+                }
+            },
+            "nodes": [],
+            "type": "IMAGE"
+        },
+        {
+            "paragraphData": {
+                "textStyle": {
+                    "textAlignment": "LEFT"
+                }
+            },
+            "style": {},
+            "id": "ew5hz2191",
+            "nodes": [
+                {
+                    "id": "",
+                    "nodes": [],
+                    "textData": {
+                        "decorations": [
+                            {
+                                "fontWeightValue": 700,
+                                "type": "BOLD"
+                            },
+                            {
+                                "colorData": {
+                                    "foreground": "#FA854F"
+                                },
+                                "type": "COLOR"
+                            }
+                        ],
+                        "text": "VHE Signals Tab UX Update"
+                    },
+                    "type": "TEXT"
+                }
+            ],
+            "type": "PARAGRAPH"
+        },
+        {
+            "bulletedListData": {
+                "indentation": 0
+            },
+            "id": "9it512240",
+            "nodes": [
+                {
+                    "id": "khfmh2241",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "mqtge2308",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "Previously, the Standalone Signals screen did not provide a clear indication of the status of the customer\u2019s account when sending an invite to the Vivint app. This could lead to users resending the invite multiple times, only to receive error messages stating: \u201cFailed to Resend User Invitation\u201d"
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                },
+                {
+                    "id": "gdl3d2348",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "661vu2349",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "The Standalone Signals Tab now shows a customer\u2019s account status and will inform the pro "
+                                    },
+                                    "type": "TEXT"
+                                },
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [
+                                            {
+                                                "fontWeightValue": 700,
+                                                "type": "BOLD"
+                                            }
+                                        ],
+                                        "text": "that a refresh of the signals page is required "
+                                    },
+                                    "type": "TEXT"
+                                },
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "once the customer has created an account (To refresh the specific page, users should swipe down on the right half of the screen, as opposed to swiping down the job execution tabs on the left)."
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                }
+            ],
+            "type": "BULLETED_LIST"
+        },
+        {
+            "id": "ep3eh2476",
+            "imageData": {
+                "containerData": {
+                    "alignment": "LEFT",
+                    "textWrap": false,
+                    "width": {
+                        "size": "SMALL"
+                    }
+                },
+                "image": {
+                    "height": 1227,
+                    "src": {
+                        "id": "97ce51_9f74e97e93c54ef990578ea91efe20bd~mv2.png"
+                    },
+                    "width": 1227
+                }
+            },
+            "nodes": [],
+            "type": "IMAGE"
+        },
+        {
+            "paragraphData": {
+                "textStyle": {
+                    "textAlignment": "LEFT"
+                }
+            },
+            "style": {},
+            "id": "e0cjx2858",
+            "nodes": [
+                {
+                    "id": "",
+                    "nodes": [],
+                    "textData": {
+                        "decorations": [
+                            {
+                                "fontWeightValue": 700,
+                                "type": "BOLD"
+                            },
+                            {
+                                "colorData": {
+                                    "foreground": "#FA854F"
+                                },
+                                "type": "COLOR"
+                            }
+                        ],
+                        "text": "Memory Surge-Driven Price Adjustments"
+                    },
+                    "type": "TEXT"
+                }
+            ],
+            "type": "PARAGRAPH"
+        },
+        {
+            "paragraphData": {
+                "textStyle": {
+                    "textAlignment": "LEFT"
+                }
+            },
+            "style": {},
+            "id": "d66ds2969",
+            "nodes": [
+                {
+                    "id": "",
+                    "nodes": [],
+                    "textData": {
+                        "decorations": [],
+                        "text": "AI and data-center demand has caused memory chip prices to surge dramatically. Because Vivint products use memory chips, the prices of some items have been adjusted to account for the surge."
+                    },
+                    "type": "TEXT"
+                }
+            ],
+            "type": "PARAGRAPH"
+        },
+        {
+            "paragraphData": {
+                "textStyle": {
+                    "textAlignment": "LEFT"
+                }
+            },
+            "style": {},
+            "id": "dyri72971",
+            "nodes": [
+                {
+                    "id": "",
+                    "nodes": [],
+                    "textData": {
+                        "decorations": [
+                            {
+                                "fontWeightValue": 700,
+                                "type": "BOLD"
+                            }
+                        ],
+                        "text": "Affected items:"
+                    },
+                    "type": "TEXT"
+                }
+            ],
+            "type": "PARAGRAPH"
+        },
+        {
+            "bulletedListData": {
+                "indentation": 0
+            },
+            "id": "7rjx23013",
+            "nodes": [
+                {
+                    "id": "hcfcx3014",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "z7sjg2973",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "Upfront DVR $299 -> $399"
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                },
+                {
+                    "id": "e716f3016",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "5nagf2975",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "Smart Hub Panels (Upgrades): $499 -> $599"
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                },
+                {
+                    "id": "rq5ys3018",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "xb53h2977",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "Discount Starter Kit: $599 -> $749"
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                },
+                {
+                    "id": "93r2q3020",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "6ilcb2979",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "Starter Kit: $1,799 -> $1,899"
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                },
+                {
+                    "id": "f5czh1055",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "rxjky1095",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "$1 Increase on Monthly DVR - New Sales Only (Free-trial will still cover full DVR monthly amount)"
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                }
+            ],
+            "type": "BULLETED_LIST"
+        },
+        {
+            "paragraphData": {
+                "textStyle": {
+                    "textAlignment": "LEFT"
+                }
+            },
+            "style": {},
+            "id": "9ap8i2981",
+            "nodes": [
+                {
+                    "id": "",
+                    "nodes": [],
+                    "textData": {
+                        "decorations": [
+                            {
+                                "fontWeightValue": 700,
+                                "type": "BOLD"
+                            }
+                        ],
+                        "text": "Not Affected:"
+                    },
+                    "type": "TEXT"
+                }
+            ],
+            "type": "PARAGRAPH"
+        },
+        {
+            "bulletedListData": {
+                "indentation": 0
+            },
+            "id": "xc0lj3055",
+            "nodes": [
+                {
+                    "id": "r89963056",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "wduk12983",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "The following changes have been made to ensure that quotes created for FO Sales & FO/Care Upgrades prior to this change will be honored."
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        },
+                        {
+                            "bulletedListData": {
+                                "indentation": 0
+                            },
+                            "id": "ynvoa3830",
+                            "nodes": [
+                                {
+                                    "id": "7nfb53058",
+                                    "nodes": [
+                                        {
+                                            "id": "mwjdz2985",
+                                            "nodes": [
+                                                {
+                                                    "id": "",
+                                                    "nodes": [],
+                                                    "textData": {
+                                                        "decorations": [],
+                                                        "text": "WOs scheduled before 4/1."
+                                                    },
+                                                    "type": "TEXT"
+                                                }
+                                            ],
+                                            "paragraphData": {},
+                                            "type": "PARAGRAPH"
+                                        }
+                                    ],
+                                    "type": "LIST_ITEM"
+                                },
+                                {
+                                    "id": "qbaor3061",
+                                    "nodes": [
+                                        {
+                                            "id": "6ihdn2988",
+                                            "nodes": [
+                                                {
+                                                    "id": "",
+                                                    "nodes": [],
+                                                    "textData": {
+                                                        "decorations": [],
+                                                        "text": "Sales created during the week of 3/23."
+                                                    },
+                                                    "type": "TEXT"
+                                                }
+                                            ],
+                                            "paragraphData": {},
+                                            "type": "PARAGRAPH"
+                                        }
+                                    ],
+                                    "type": "LIST_ITEM"
+                                }
+                            ],
+                            "type": "BULLETED_LIST"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                }
+            ],
+            "type": "BULLETED_LIST"
+        },
+        {
+            "id": "ewm803234",
+            "imageData": {
+                "containerData": {
+                    "alignment": "LEFT",
+                    "textWrap": false,
+                    "width": {
+                        "size": "SMALL"
+                    }
+                },
+                "image": {
+                    "height": 1227,
+                    "src": {
+                        "id": "97ce51_2d2b733d231646c3914983872964c380~mv2.png"
+                    },
+                    "width": 1227
+                }
+            },
+            "nodes": [],
+            "type": "IMAGE"
+        },
+        {
+            "style": {},
+            "id": "n5o1r3963",
+            "nodes": [
+                {
+                    "id": "",
+                    "nodes": [],
+                    "textData": {
+                        "decorations": [
+                            {
+                                "colorData": {
+                                    "foreground": "#05E5AF"
+                                },
+                                "type": "COLOR"
+                            }
+                        ],
+                        "text": "Fixed Bugs"
+                    },
+                    "type": "TEXT"
+                }
+            ],
+            "headingData": {
+                "level": 3,
+                "textStyle": {
+                    "textAlignment": "LEFT"
+                }
+            },
+            "type": "HEADING"
+        },
+        {
+            "paragraphData": {
+                "textStyle": {
+                    "textAlignment": "LEFT"
+                }
+            },
+            "style": {},
+            "id": "u73zw4515",
+            "nodes": [
+                {
+                    "id": "",
+                    "nodes": [],
+                    "textData": {
+                        "decorations": [
+                            {
+                                "fontWeightValue": 700,
+                                "type": "BOLD"
+                            },
+                            {
+                                "colorData": {
+                                    "foreground": "#FA854F"
+                                },
+                                "type": "COLOR"
+                            }
+                        ],
+                        "text": "iOS 26 Support Changes"
+                    },
+                    "type": "TEXT"
+                }
+            ],
+            "type": "PARAGRAPH"
+        },
+        {
+            "bulletedListData": {
+                "indentation": 0
+            },
+            "id": "gg8de4721",
+            "nodes": [
+                {
+                    "id": "4j5xo4722",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "nd4ya4755",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "Previously, certain UI features would not display correctly when pros updated their devices to IOS 26"
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                },
+                {
+                    "id": "6duon4828",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "j01xk4829",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "Multiple UI features have been updated to better align with IOS 26 features and improve user experience."
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                },
+                {
+                    "id": "9fjoi4900",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "zjtpg4901",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "Users may still encounter some UI bugs, such as extra white space in the job popover, and overlapping notifications. These will be addressed in an upcoming sprint."
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                }
+            ],
+            "type": "BULLETED_LIST"
+        },
+        {
+            "id": "m9yue5090",
+            "imageData": {
+                "containerData": {
+                    "alignment": "LEFT",
+                    "textWrap": false,
+                    "width": {
+                        "size": "SMALL"
+                    }
+                },
+                "image": {
+                    "height": 1215,
+                    "src": {
+                        "id": "97ce51_60bfd7f492944ae695471e02de1aec20~mv2.png"
+                    },
+                    "width": 1321
+                }
+            },
+            "nodes": [],
+            "type": "IMAGE"
+        },
+        {
+            "paragraphData": {
+                "textStyle": {
+                    "textAlignment": "LEFT"
+                }
+            },
+            "style": {},
+            "id": "h54co5624",
+            "nodes": [
+                {
+                    "id": "",
+                    "nodes": [],
+                    "textData": {
+                        "decorations": [
+                            {
+                                "fontWeightValue": 700,
+                                "type": "BOLD"
+                            },
+                            {
+                                "colorData": {
+                                    "foreground": "#FA854F"
+                                },
+                                "type": "COLOR"
+                            }
+                        ],
+                        "text": "Old Chat Menu Still Appearing (Released 3/18)"
+                    },
+                    "type": "TEXT"
+                }
+            ],
+            "type": "PARAGRAPH"
+        },
+        {
+            "bulletedListData": {
+                "indentation": 0
+            },
+            "id": "so7g65856",
+            "nodes": [
+                {
+                    "id": "1xqzr5857",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "xqmxw5894",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "Occasionally when using chat support, the old chat menu would appear when the AI assistant should instead assist the user in connecting to the correct team."
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                },
+                {
+                    "id": "y8jrf5972",
+                    "nodes": [
+                        {
+                            "paragraphData": {
+                                "textStyle": {
+                                    "textAlignment": "LEFT"
+                                }
+                            },
+                            "style": {},
+                            "id": "kwdfk5973",
+                            "nodes": [
+                                {
+                                    "id": "",
+                                    "nodes": [],
+                                    "textData": {
+                                        "decorations": [],
+                                        "text": "A hotfix was released on 3/18 to ensure users are reliably connected to the AI assistant instead of being presented with the outdated routing menu."
+                                    },
+                                    "type": "TEXT"
+                                }
+                            ],
+                            "type": "PARAGRAPH"
+                        }
+                    ],
+                    "type": "LIST_ITEM"
+                }
+            ],
+            "type": "BULLETED_LIST"
+        },
+        {
+            "id": "jxwkq6179",
+            "imageData": {
+                "containerData": {
+                    "alignment": "LEFT",
+                    "textWrap": false,
+                    "width": {
+                        "size": "SMALL"
+                    }
+                },
+                "image": {
+                    "height": 1227,
+                    "src": {
+                        "id": "97ce51_3d28456a18c34e5f90f0c950557adc15~mv2.png"
+                    },
+                    "width": 1227
+                }
+            },
+            "nodes": [],
+            "type": "IMAGE"
+        },
+        {
+            "id": "86b8g6220",
+            "nodes": [],
+            "paragraphData": {},
+            "type": "PARAGRAPH"
+        }
+    ]
+}

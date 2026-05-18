@@ -8,10 +8,10 @@ interface ITextElement {
 
 const TextElement = ({node}: ITextElement) => {
     return (
-        <p data-node-id={node.id} 
+        <div data-node-id={node.id} 
              data-node-type={node.type}
-             className="outline-none w-full min-h-[1em] wrap-anywhere"
-        >{node.content}</p>
+             className="outline-none w-full wrap-anywhere"
+        >{node.content || <br />}</div>
     )
 }
 
