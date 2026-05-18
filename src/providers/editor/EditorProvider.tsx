@@ -1,7 +1,13 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { NODE_TYPES, type RosetteNode } from "../../nodes/types";
-import { createListItemNode, createOrderedListNode, createTextNode, createUnorderedListNode } from "../../nodes/factories";
 import { findNodeById, updateNodeById } from "../../nodes/utils";
+import { createTextNode } from "../../nodes/factories";
+
+interface EditorProviderProps {
+    children: ReactNode;
+    defaultValue?: RosetteNode[],
+    onChange?: (nodes: RosetteNode[]) => void;
+}
 
 interface EditorContextValue {
     nodes: RosetteNode[];
@@ -20,39 +26,15 @@ export const useEditor = () => {
     return ctx;
 }
 
-export const EditorProvider = ({children}: {children: ReactNode}) => {
+export const EditorProvider = ({children, defaultValue, onChange}: EditorProviderProps) => {
     const [focusNext, setFocusNext] = useState<{nodeId: string, offset: number}>({nodeId: "", offset: 0});
     const dirtyNodeIdsRef = useRef<Set<string>>(new Set());
 
-    const [nodes, setNodes] = useState<RosetteNode[]>([
-        createTextNode("Ordered List"),
-        {
-            ...createOrderedListNode(),
-            nodes: [
-                createListItemNode("Hey"),
-                createListItemNode("Ashley!"),
-                createListItemNode("This works!")
-            ]
-        },
-        createTextNode("Unordered List"),
-        {
-            ...createUnorderedListNode(),
-            nodes: [
-                createListItemNode("The raw rich content"),
-                createListItemNode("is down"),
-                createListItemNode("below!"),
-                createListItemNode("Click on me and click [UL] or [OL]")
-            ]
-        },
-        createTextNode(""),
-        createTextNode("Try to select me then click [OL]"),
-        createTextNode(""),
-        createTextNode("Try to select me then click [UL]"),
-        createTextNode(""),
-        createTextNode("Delete button only works for text not nested in a list so far!"),
-        createTextNode(""),
-        createTextNode("It's not very user friendly yet! But once we get more inline controls it'll start feeling good!")
-    ]);
+    const [nodes, setNodes] = useState<RosetteNode[]>(defaultValue || [createTextNode()]);
+
+    useEffect(() => {
+        onChange?.(nodes);
+    }, [nodes])
 
     const replaceNodes = (updatedNodes: RosetteNode[]) => {
         setNodes(updatedNodes);

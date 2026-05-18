@@ -9,6 +9,11 @@ import { deleteNode, insertToolbarNode } from "../../nodes/commands";
 import { useEffect, useRef, type KeyboardEvent } from "react";
 import "./editor.css";
 
+interface EditorProps {
+    defaultValue?: RosetteNode[];
+    onChange?: (nodes: RosetteNode[]) => null;
+}
+
 
 const EditorInner = () => {
     const {nodes, replaceNodes, focusNode} = useEditor();
@@ -325,45 +330,44 @@ const EditorInner = () => {
     }
 
     return (
-        <Panel>
-            <div className="flex flex-col gap-4">
-                <p>Rosette</p>
-
-                <div
-                className="flex flex-col items-start bg-(--color-dark-slate) p-4 inset-shadow-md whitespace-pre-wrap"
-                contentEditable 
-                suppressContentEditableWarning
-                ref={editorRef}
-                onKeyDown={keyDownHandler} 
-                onPaste={(e) => e.preventDefault()}
-                >
-                    {nodes.map((n: RosetteNode) => renderNode(n))}
+        <div className="w-full flex flex-row gap-2">
+            <Panel>
+                <div className="flex flex-col gap-4 min-w-100">
+                    <p>Rosette</p>
+                    <div
+                    className="flex flex-col items-start bg-(--color-dark-slate) p-4 inset-shadow-md whitespace-pre-wrap"
+                    contentEditable
+                    suppressContentEditableWarning
+                    ref={editorRef}
+                    onKeyDown={keyDownHandler}
+                    onPaste={(e) => e.preventDefault()}
+                    >
+                        {nodes.map((n: RosetteNode) => renderNode(n))}
+                    </div>
+                    {/** Toolbar */}
+                    <div className="flex gap-4">
+                        <ToolbarButton
+                            buttonText="OL"
+                            node={createOrderedListNode}
+                            onClick={toolbarHandler}
+                        />
+                        <ToolbarButton
+                            buttonText="UL"
+                            node={createUnorderedListNode}
+                            onClick={toolbarHandler}
+                        />
+                    </div>
                 </div>
-
-                {/** Toolbar */}
-                <div className="flex gap-4">
-                    <ToolbarButton 
-                        buttonText="OL" 
-                        node={createOrderedListNode}
-                        onClick={toolbarHandler} 
-                    />
-
-                    <ToolbarButton 
-                        buttonText="UL" 
-                        node={createUnorderedListNode}
-                        onClick={toolbarHandler} 
-                    />
-                </div>
-            </div>
-            {false && <pre className='absolute top-[100%] left-0'>{JSON.stringify(nodes, null, 2)}</pre>}
-        </Panel>
+            </Panel>
+            {false && <pre className="max-h-20">{JSON.stringify(nodes, null, 2)}</pre>}
+        </div>
     )
 }
 
 
-const Editor = () => {
+const Editor = ({defaultValue, onChange}: EditorProps) => {
     return (
-        <EditorProvider>
+        <EditorProvider defaultValue={defaultValue} onChange={onChange}>
             <EditorInner />
         </EditorProvider>
     )
