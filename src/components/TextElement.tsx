@@ -11,6 +11,7 @@ const TextElement = ({node}: ITextElement) => {
         <div data-node-id={node.id} 
              data-node-type={node.type}
              className="outline-none w-full wrap-anywhere"
+             style={{color: node.style?.color || "white"}}
         >{node.content || <br />}</div>
     )
 }

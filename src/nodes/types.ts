@@ -29,6 +29,9 @@ export interface ListItemNode extends RosetteNodeBase<typeof NODE_TYPES.LIST_ITE
 
 export interface TextNode extends RosetteNodeBase<typeof NODE_TYPES.TEXT> {
     content: string;
+    style?: {
+        color?: string;
+    }
 }
 
 

@@ -25,7 +25,7 @@ function App() {
           ]
       },
       createTextNode(""),
-      createTextNode("Try to select me then click [OL]"),
+      createTextNode("Try to select me then click [OL]", {color: "var(--color-green)"}),
       createTextNode(""),
       createTextNode("Try to select me then click [UL]"),
       createTextNode(""),

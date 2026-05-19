@@ -31,8 +31,9 @@ export const createListItemNode = (startingText?: string): ListItemNode => ({
 
 
 
-export const createTextNode = (content: string = ""): TextNode => ({
+export const createTextNode = (content: string = "", style?: TextNode["style"]): TextNode => ({
     id: crypto.randomUUID(),
     type: NODE_TYPES.TEXT,
-    content
+    content,
+    style
 })
