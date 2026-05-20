@@ -215,7 +215,7 @@ const EditorInner = ({className}: {className?: string}) => {
                     return;
                 }
 
-                var focusedNodeId;
+                var focusedNode;
                 var focusOffset;
 
                 let syncedNodes = [...nodes];
@@ -224,30 +224,32 @@ const EditorInner = ({className}: {className?: string}) => {
                 if (parent && parent.type === NODE_TYPES.LIST_ITEM && parentPath[parentPath.length - 1] === 0) {
                     // if the node before belongs toa. list, add to the list instead
                     const nodeBeforeParent = getNodeAtPath(nodes, getParentPath(nodeBefore.nodePath));
-                    const newNode = nodeBeforeParent ? createListItemNode(node.content) : createTextNode(node.content);
+                    const newNode = nodeBeforeParent ? createListItemNode(node.content) : createTextNode();
                     
                     syncedNodes = insertNodeAfter(syncedNodes, nodeBeforeParent?.id || nodeBefore.node.id, newNode);
-                    focusedNodeId = findNodeOfType(newNode, NODE_TYPES.TEXT)!.id;
+                    focusedNode = findNodeOfType(newNode, NODE_TYPES.TEXT);
+                    console.log("Focused Node", focusedNode);
+                    focusOffset = focusedNode?.content.length || 0;
                 }
+
+                // if we haven't already focused a node, focus it to text before
+                focusedNode = focusedNode || textNodeBefore;
+                focusOffset = focusOffset === undefined ? textNodeBefore.content.length : focusOffset;
 
                 // if deleted node has content left in it
                 if (node.content) {
-                    syncedNodes = updateNodeById(syncedNodes, textNodeBefore.id, {
-                        ...textNodeBefore,
-                        content: textNodeBefore.content + node.content
+                    syncedNodes = updateNodeById(syncedNodes, focusedNode.id, {
+                        ...focusedNode,
+                        content: focusedNode.content + node.content
                     });
-
-                    focusedNodeId = textNodeBefore.id;
-                    focusOffset = textNodeBefore.content.length;
                 }
 
                 syncedNodes = deleteNode(syncedNodes, node.id);
                 replaceNodes(syncedNodes);
 
-                focusedNodeId = focusedNodeId || textNodeBefore.id;
-                focusOffset = focusOffset || textNodeBefore.content.length;
-                console.log(focusedNodeId, focusOffset);
-                focusNode(focusedNodeId, focusOffset);
+                
+                console.log(focusedNode.id, focusOffset);
+                focusNode(focusedNode.id, focusOffset);
             }
         }
 
