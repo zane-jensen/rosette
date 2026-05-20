@@ -13,6 +13,7 @@ export type RosetteNodeOfType<T extends RosetteNodeType> = Extract<RosetteNode, 
 interface RosetteNodeBase<TType extends string> {
     id: string;
     type: TType;
+    tags: string[];
     nodes?: RosetteNode[];
 }
 
