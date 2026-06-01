@@ -219,14 +219,14 @@ const EditorInner = ({className}: {className?: string}) => {
                 var focusOffset;
 
                 let syncedNodes = [...nodes];
-
+                
+                const nodeBeforeParent = getNodeAtPath(nodes, getParentPath(nodeBefore.nodePath));
                 // if text node is the first element in a list
-                if (parent && parent.type === NODE_TYPES.LIST_ITEM && parentPath[parentPath.length - 1] === 0) {
-                    // if the node before belongs toa. list, add to the list instead
-                    const nodeBeforeParent = getNodeAtPath(nodes, getParentPath(nodeBefore.nodePath));
-                    const newNode = nodeBeforeParent ? createListItemNode(node.content) : createTextNode();
+                if (parent && !nodeBeforeParent && parent.type === NODE_TYPES.LIST_ITEM && parentPath[parentPath.length - 1] === 0) {
+                    // if the node before belongs toa list, add to the list instead
+                    const newNode = createTextNode(node.content);
                     
-                    syncedNodes = insertNodeAfter(syncedNodes, nodeBeforeParent?.id || nodeBefore.node.id, newNode);
+                    syncedNodes = insertNodeAfter(syncedNodes, nodeBefore.node.id, newNode);
                     focusedNode = findNodeOfType(newNode, NODE_TYPES.TEXT);
                     console.log("Focused Node", focusedNode);
                     focusOffset = focusedNode?.content.length || 0;
@@ -235,14 +235,6 @@ const EditorInner = ({className}: {className?: string}) => {
                 // if we haven't already focused a node, focus it to text before
                 focusedNode = focusedNode || textNodeBefore;
                 focusOffset = focusOffset === undefined ? textNodeBefore.content.length : focusOffset;
-
-                // if deleted node has content left in it
-                if (node.content) {
-                    syncedNodes = updateNodeById(syncedNodes, focusedNode.id, {
-                        ...focusedNode,
-                        content: focusedNode.content + node.content
-                    });
-                }
 
                 syncedNodes = deleteNode(syncedNodes, node.id);
                 replaceNodes(syncedNodes);
