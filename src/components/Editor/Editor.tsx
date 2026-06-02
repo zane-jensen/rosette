@@ -202,10 +202,12 @@ const EditorInner = ({className}: {className?: string}) => {
                 const parentPath = getParentPath(nodePath);
                 const parent = getNodeAtPath(nodes, parentPath);
 
+                let syncedNodes = [...nodes];
+
                 // if node has no other text nodes before it (last node)
                 const textNodeBefore = findNodeOfType(nodeBefore.node, NODE_TYPES.TEXT);
                 if (!textNodeBefore) {
-                    let syncedNodes = updateNodeById(nodes, node.id, {
+                    syncedNodes = updateNodeById(syncedNodes, node.id, {
                         ...node,
                         content: ""
                     });
@@ -218,28 +220,25 @@ const EditorInner = ({className}: {className?: string}) => {
                 var focusedNode;
                 var focusOffset;
 
-                let syncedNodes = [...nodes];
-                
+                syncedNodes = deleteNode(syncedNodes, node.id);
+
                 const nodeBeforeParent = getNodeAtPath(nodes, getParentPath(nodeBefore.nodePath));
-                // if text node is the first element in a list
+                // if text node was the first element in a list
                 if (parent && !nodeBeforeParent && parent.type === NODE_TYPES.LIST_ITEM && parentPath[parentPath.length - 1] === 0) {
-                    const newNode = createTextNode(node.content);
+                    const newNode = {...createTextNode(node.content), id: node.id}
                     
-                    syncedNodes = insertNodeAfter(syncedNodes, nodeBefore.node.id, {...newNode, id: node.id});
+                    syncedNodes = insertNodeAfter(syncedNodes, nodeBefore.node.id, newNode);
                     focusedNode = findNodeOfType(newNode, NODE_TYPES.TEXT);
                     console.log("Focused Node", focusedNode);
-                    focusOffset = focusedNode?.content.length || 0;
+                    focusOffset = 0;
                 }
 
                 // if we haven't already focused a node, focus it to text before
                 focusedNode = focusedNode || textNodeBefore;
                 focusOffset = focusOffset === undefined ? textNodeBefore.content.length : focusOffset;
-
-                syncedNodes = deleteNode(syncedNodes, node.id);
-                replaceNodes(syncedNodes);
-
                 
                 console.log(focusedNode.id, focusOffset);
+                replaceNodes(syncedNodes);
                 focusNode(focusedNode.id, focusOffset);
             }
         }
