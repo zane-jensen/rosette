@@ -225,7 +225,7 @@ const EditorInner = ({className}: {className?: string}) => {
                 if (parent && !nodeBeforeParent && parent.type === NODE_TYPES.LIST_ITEM && parentPath[parentPath.length - 1] === 0) {
                     const newNode = createTextNode(node.content);
                     
-                    syncedNodes = insertNodeAfter(syncedNodes, nodeBefore.node.id, newNode);
+                    syncedNodes = insertNodeAfter(syncedNodes, nodeBefore.node.id, {...newNode, id: node.id});
                     focusedNode = findNodeOfType(newNode, NODE_TYPES.TEXT);
                     console.log("Focused Node", focusedNode);
                     focusOffset = focusedNode?.content.length || 0;
