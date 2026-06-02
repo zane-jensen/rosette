@@ -225,11 +225,10 @@ const EditorInner = ({className}: {className?: string}) => {
                 const nodeBeforeParent = getNodeAtPath(nodes, getParentPath(nodeBefore.nodePath));
                 // if text node was the first element in a list
                 if (parent && !nodeBeforeParent && parent.type === NODE_TYPES.LIST_ITEM && parentPath[parentPath.length - 1] === 0) {
-                    const newNode = {...createTextNode(node.content), id: node.id}
+                    const newNode = {...createTextNode(), id: node.id}
                     
                     syncedNodes = insertNodeAfter(syncedNodes, nodeBefore.node.id, newNode);
                     focusedNode = findNodeOfType(newNode, NODE_TYPES.TEXT);
-                    console.log("Focused Node", focusedNode);
                     focusOffset = 0;
                 }
 
@@ -238,6 +237,11 @@ const EditorInner = ({className}: {className?: string}) => {
                 focusOffset = focusOffset === undefined ? textNodeBefore.content.length : focusOffset;
                 
                 console.log(focusedNode.id, focusOffset);
+                syncedNodes = updateNodeById(syncedNodes, focusedNode.id, {
+                    ...focusedNode,
+                    content: focusedNode.content + node.content
+                });
+                
                 replaceNodes(syncedNodes);
                 focusNode(focusedNode.id, focusOffset);
             }
