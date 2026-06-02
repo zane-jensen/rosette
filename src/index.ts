@@ -23,5 +23,7 @@ export type {
     TextNode,
     ListItemNode,
     OrderedListNode,
-    UnorderedListNode
+    UnorderedListNode,
+    RosetteNodeType,
+    RosetteNodeOfType
 } from "./nodes/types";

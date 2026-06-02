@@ -223,7 +223,6 @@ const EditorInner = ({className}: {className?: string}) => {
                 const nodeBeforeParent = getNodeAtPath(nodes, getParentPath(nodeBefore.nodePath));
                 // if text node is the first element in a list
                 if (parent && !nodeBeforeParent && parent.type === NODE_TYPES.LIST_ITEM && parentPath[parentPath.length - 1] === 0) {
-                    // if the node before belongs toa list, add to the list instead
                     const newNode = createTextNode(node.content);
                     
                     syncedNodes = insertNodeAfter(syncedNodes, nodeBefore.node.id, newNode);
