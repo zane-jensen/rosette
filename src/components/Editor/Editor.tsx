@@ -235,10 +235,10 @@ const EditorInner = ({className}: {className?: string}) => {
                 // if we haven't already focused a node, focus it to text before
                 focusedNode = focusedNode || textNodeBefore;
                 focusOffset = focusOffset === undefined ? textNodeBefore.content.length : focusOffset;
-                
-                console.log(focusedNode.id, focusOffset);
+
                 syncedNodes = updateNodeById(syncedNodes, focusedNode.id, {
                     ...focusedNode,
+                    id: focusedNode.content === "" ? node.id : focusedNode.id,
                     content: focusedNode.content + node.content
                 });
                 
