@@ -47,6 +47,10 @@ const getElementFromDOMNode = (node: Node): HTMLElement | null => {
     return element?.closest("[data-node-id]") as HTMLElement | null;
 }
 
+const getEditorElement = (root: HTMLElement) => {
+    return root.closest("[contenteditable]") ?? document;
+}
+
 const getSelectedElements = () => {
     const selection = window.getSelection();
     if (!selection || selection.isCollapsed || selection.rangeCount === 0) return null;
@@ -69,7 +73,7 @@ const getSelectedElements = () => {
     }
 }
 
-export const getSelectedNodes = (nodes: RosetteNode[]) => {
+export const getSelectedNodeRange = (nodes: RosetteNode[]) => {
     const elementRange = getSelectedElements();
     if (!elementRange) return null;
 
@@ -93,23 +97,23 @@ export const getSelectedNodes = (nodes: RosetteNode[]) => {
     );
 }
 
-export const splitTextElement = (element: HTMLElement) => {
+export const getSelectedNodes = (nodes: RosetteNode[]) => {
     const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return ["", element.textContent];
-    
+    if (!selection || selection.rangeCount === 0 || selection.isCollapsed || !selection.anchorNode) return [];
+
     const range = selection.getRangeAt(0);
-    const text = element.textContent ?? "";
 
-    const preCaretRange = range.cloneRange();
-    preCaretRange.selectNodeContents(element);
-    preCaretRange.setEnd(range.startContainer, range.startOffset);
+    const root = getElementFromDOMNode(selection.anchorNode);
+    if (!root) return [];
 
-    const offset = preCaretRange.toString().length;
+    const editor = getEditorElement(root);
 
-    return [
-        text.slice(0, offset),
-        text.slice(offset)
-    ]
+    const elements = [...editor.querySelectorAll<HTMLElement>(`[data-node-type="text"]`)]
+        .filter(el => range.intersectsNode(el));
+
+    return elements
+        .map(el => findNodeById(nodes, el.dataset.nodeId!))
+        .filter(result => result != null);
 }
 
 
@@ -167,25 +171,6 @@ export const insertNodeAtPath = (nodes: RosetteNode[], node: RosetteNode, nodePa
     }
 
     return nodes
-}
-
-
-export const insertNodeAfter = (nodes: RosetteNode[], targetNodeId: string, newNode: RosetteNode): RosetteNode[] => {
-    const target = findNodeById(nodes, targetNodeId);
-    if (!target) return nodes;
-
-    const parent = getNodeAtPath(nodes, getParentPath(target.nodePath));
-    if (!parent || !parent.nodes) {
-        return [...nodes.slice(0, target.nodePath[0] + 1), newNode, ...nodes.slice(target.nodePath[0] + 1)];
-    }
-
-    const targetPathOffset = target.nodePath[target.nodePath.length - 1] + 1;
-    const updatedParent = {
-        ...parent,
-        nodes: [...parent.nodes.slice(0, targetPathOffset), newNode, ...parent.nodes.slice(targetPathOffset)]
-    }
-
-    return updateNodeById(nodes, parent.id, updatedParent);
 }
 
 

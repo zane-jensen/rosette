@@ -1,6 +1,6 @@
 import { createListItemNode } from "./factories";
 import { NODE_TYPES, type FindNodeResult, type RosetteNode } from "./types";
-import { deleteNodeById, findNodeById, getNodeAtPath, getParentPath, insertNodeAtPath } from "./utils";
+import { deleteNodeById, findNodeById, getNodeAtPath, getParentPath, insertNodeAtPath, updateNodeById } from "./utils";
 
 
 
@@ -28,6 +28,48 @@ export const deleteNode = (
 
     const updatedNodes = deleteNodeById(nodes, deletedNodeId);
     return updatedNodes;
+}
+
+
+
+export const insertNodeAfter = (nodes: RosetteNode[], targetNodeId: string, newNode: RosetteNode | RosetteNode[]): RosetteNode[] => {
+    const newNodes = Array.isArray(newNode) ? newNode : [newNode];
+
+    const target = findNodeById(nodes, targetNodeId);
+    if (!target) return nodes;
+
+    const parent = getNodeAtPath(nodes, getParentPath(target.nodePath));
+    if (!parent || !parent.nodes) {
+        return [...nodes.slice(0, target.nodePath[0] + 1), ...newNodes, ...nodes.slice(target.nodePath[0] + 1)];
+    }
+
+    const targetPathOffset = target.nodePath[target.nodePath.length - 1] + 1;
+    const updatedParent = {
+        ...parent,
+        nodes: [...parent.nodes.slice(0, targetPathOffset), ...newNodes, ...parent.nodes.slice(targetPathOffset)]
+    }
+
+    return updateNodeById(nodes, parent.id, updatedParent);
+}
+
+
+
+export const insertNodeBefore = (nodes: RosetteNode[], targetNodeId: string, newNode: RosetteNode): RosetteNode[] => {
+    const target = findNodeById(nodes, targetNodeId);
+    if (!target) return nodes;
+
+    const parent = getNodeAtPath(nodes, getParentPath(target.nodePath));
+    if (!parent || !parent.nodes) {
+        return [...nodes.slice(0, target.nodePath[0]), newNode, ...nodes.slice(target.nodePath[0])];
+    }
+
+    const targetPathOffset = target.nodePath[target.nodePath.length - 1];
+    const updatedParent = {
+        ...parent,
+        nodes: [...parent.nodes.slice(0, targetPathOffset), newNode, ...parent.nodes.slice(targetPathOffset)]
+    }
+
+    return updateNodeById(nodes, parent.id, updatedParent);
 }
 
 

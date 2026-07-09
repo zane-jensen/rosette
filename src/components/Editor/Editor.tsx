@@ -1,12 +1,12 @@
 import Panel from "../Panel";
 import ToolbarButton from "../ToolbarButton";
-import { NODE_TYPES, type OrderedListNode, type RosetteNode, type UnorderedListNode } from "../../nodes/types";
+import { NODE_TYPES, type OrderedListNode, type RosetteNode, type TextNode, type UnorderedListNode } from "../../nodes/types";
 import { renderNode } from "../../nodes/renderNode";
-import { createListItemNode, createOrderedListNode, createTextNode, createUnorderedListNode } from "../../nodes/factories";
-import { findNodeById, findNodeOfType, getActiveElement, getActiveNode, getNodeAtPath, getNodeBefore, getParentPath, insertNodeAfter, splitTextElement, updateNodeById } from "../../nodes/utils";
+import { copyNodes, createListItemNode, createOrderedListNode, createTextNode, createUnorderedListNode } from "../../nodes/factories";
+import { findNodeById, findNodeOfType, getActiveElement, getActiveNode, getNodeAtPath, getNodeBefore, getParentPath, getSelectedNodes, updateNodeById } from "../../nodes/utils";
 import { EditorProvider, useEditor } from "../../providers/editor/EditorProvider";
-import { deleteNode, insertToolbarNode } from "../../nodes/commands";
-import { useEffect, useRef, type KeyboardEvent } from "react";
+import { deleteNode, insertToolbarNode, insertNodeAfter, insertNodeBefore } from "../../nodes/commands";
+import { useEffect, useRef, type ClipboardEvent, type KeyboardEvent } from "react";
 import "./editor.css";
 
 interface EditorProps {
@@ -42,10 +42,67 @@ const EditorInner = ({className}: {className?: string}) => {
         if (newTextNode) focusNode(newTextNode.id, newTextNode.content.length);
     }
 
-    const beforeInputHandler = (e: globalThis.InputEvent) => {
+    const copyHandler = (e: ClipboardEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const selection = window.getSelection();
+        if (!selection || selection.isCollapsed) return;
+
+        const selectedNodes = getSelectedNodes(nodes);
+
+        const topNodes: RosetteNode[] = [];
+        const topNodeIds: string[] = [];
+
+        for (let nodeResult of selectedNodes) {
+            let {nodePath} = nodeResult;
+
+            let topNode = getNodeAtPath(nodes, [nodePath[0]]);
+            if (!topNode) continue;
+
+            if (!topNodeIds.includes(topNode.id)) {
+                topNodes.push(topNode);
+                topNodeIds.push(topNode.id);
+            }
+        }
+
+        e.clipboardData.setData("text/plain", selection.toString());
+        e.clipboardData.setData("application/rosette+json", JSON.stringify(topNodes));
+    }
+
+    const pasteHandler = (e: ClipboardEvent<HTMLDivElement>) => {
         e.preventDefault();
 
-        console.log(e);
+        let syncedNodes = nodes;
+
+        const activeNode = getActiveNode(syncedNodes);
+        if (!activeNode) return;
+
+        const rosetteData = e.clipboardData.getData("application/rosette+json");
+        const plainText = e.clipboardData.getData("text/plain");
+
+        let newNodes: RosetteNode[] = [];
+        if (rosetteData) {
+            newNodes = copyNodes(JSON.parse(rosetteData));
+        }
+        else if (plainText) {
+            const lines = plainText.split(/\r?\n/).map(l => l.trim());
+            newNodes = lines.map(line => createTextNode(line));
+        }
+
+        if (newNodes.length === 0) return;
+
+        syncedNodes = insertNodeAfter(syncedNodes, activeNode.node.id, newNodes);
+        replaceNodes(syncedNodes);
+
+        // focus last node
+        let lastNode = newNodes.at(-1)!;
+        let focusedTextNode = findNodeOfType(lastNode, NODE_TYPES.TEXT);
+        if (!focusedTextNode) return;
+        focusNode(focusedTextNode.id, focusedTextNode.content.length);
+    }
+
+    const beforeInputHandler = (e: globalThis.InputEvent) => {
+        e.preventDefault();
+        const inputType = e.inputType;
 
         const active = getActiveNode(nodes);
         if (!active?.node || active.node.type !== NODE_TYPES.TEXT) return;
@@ -57,35 +114,71 @@ const EditorInner = ({className}: {className?: string}) => {
 
         const range = selection.getRangeAt(0);
 
-        const offset = range.startOffset
-
-        if (e.inputType === "insertText") {
+        var syncedNodes = nodes;
+        
+        if (inputType === "insertText") {
             const text = e.data ?? "";
             console.log(text);
 
-            let syncedNodes = updateNodeById(nodes, node.id, {
+            syncedNodes = updateNodeById(nodes, node.id, {
                 ...node,
-                content: node.content.slice(0, offset) + text + node.content.slice(offset)
+                content: node.content.slice(0, range.startOffset) + text + node.content.slice(range.endOffset)
             });
 
             replaceNodes(syncedNodes);
-            focusNode(node.id, offset + text.length)
+            focusNode(node.id, range.startOffset + text.length)
         }
 
-        if (e.inputType === "deleteContentBackward") {
-            let syncedNodes = updateNodeById(nodes, node.id, {
-                ...node,
-                content: node.content.slice(0, offset - 1) + node.content.slice(offset)
-            });
+        if (inputType === "deleteContentBackward") {
+            let startOffset = range.startOffset
+            const selectedNodesResults = getSelectedNodes(nodes);
+            
+            if (!selection.isCollapsed && selectedNodesResults.length > 1) {
+                let startNode = selectedNodesResults[0].node as TextNode;
+                let middleNodes = selectedNodesResults.length > 2 ? selectedNodesResults.slice(1, selectedNodesResults.length - 1) : [];
+                let endNode = selectedNodesResults[selectedNodesResults.length - 1].node as TextNode;
+
+                // start node updates
+                syncedNodes = updateNodeById(syncedNodes, startNode.id, {
+                    ...startNode,
+                    content: startNode.content.slice(0, startOffset)
+                });
+                
+                // middle node deletes
+                for (let nodeResult of middleNodes) {
+                    let node = nodeResult.node;
+                    syncedNodes = deleteNode(syncedNodes, node.id);
+                }
+
+                // end node updates
+                if (endNode.content.length === range.endOffset) {
+                    syncedNodes = deleteNode(syncedNodes, endNode.id);
+                }
+                else {
+                    syncedNodes = updateNodeById(syncedNodes, endNode.id, {
+                        ...endNode,
+                        content: endNode.content.slice(range.endOffset)
+                    })
+                }                
+            }
+            else {
+                startOffset = selection.isCollapsed ? startOffset - 1 : startOffset;
+
+                syncedNodes = updateNodeById(nodes, node.id, {
+                    ...node,
+                    content: node.content.slice(0, startOffset) + node.content.slice(range.endOffset)
+                });
+            }
 
             replaceNodes(syncedNodes);
-            focusNode(node.id, offset - 1);
+            const focusedNode = selectedNodesResults.length > 0 ? selectedNodesResults[0].node : node;
+            focusNode(focusedNode.id, Math.max(0, startOffset));
         }
 
-        if (e.inputType === "deleteSoftLineBackward") {
+        if (inputType === "deleteSoftLineBackward") {
             let syncedNodes = updateNodeById(nodes, node.id, {
                 ...node,
-                content: node.content.slice(offset)
+                content: node.content.slice(range.endOffset)
             });
 
             replaceNodes(syncedNodes);
@@ -96,25 +189,25 @@ const EditorInner = ({className}: {className?: string}) => {
     const keyDownHandler = (e: KeyboardEvent<HTMLParagraphElement>) => {
         if (e.key == "Enter") {
             e.preventDefault();
-            
-            const element = getActiveElement();
-            if (!element) return;
+            const selection = window.getSelection();
+            if (!selection || selection.rangeCount === 0) return;
 
-            const elementNodeId = element.dataset.nodeId;
-            if (!elementNodeId) return;
+            const range = selection.getRangeAt(0);
 
-            const target = findNodeById(nodes, elementNodeId);
+            let syncedNodes = [...nodes];
+
+            const target = getActiveNode(syncedNodes);
             if (!target) return;
             const {node, nodePath} = target;
 
             if (node.type !== NODE_TYPES.TEXT) return;
 
-            const [formerText, latterText] = splitTextElement(element);
+            const [formerText, latterText] = [node.content.slice(0, range.startOffset), node.content.slice(range.startOffset)];
 
             var newNode;
             var newNodeParentId;
 
-            // if neseted inside of something
+            // if nested inside of something
             if (nodePath.length > 1) {
                 const parentPath = getParentPath(nodePath);
                 const parent = getNodeAtPath(nodes, parentPath);
@@ -128,33 +221,31 @@ const EditorInner = ({className}: {className?: string}) => {
                     // if node is nested in another list make a new list item node
                     const listParentNode = getNodeAtPath(nodes, getParentPath(nodePath, 3));
                     const newNode = listParentNode ? createListItemNode() : createTextNode();
-                    console.log(listParentNode);
                     
                     let syncedNodes = insertNodeAfter(nodes, listParentNode?.id || listNode.id, newNode);
-                    syncedNodes = deleteNode(syncedNodes, elementNodeId);
+                    syncedNodes = deleteNode(syncedNodes, node.id);
                     replaceNodes(syncedNodes);
                     focusNode(newNode.id, 0);
                     return;
                 }
                 
-                newNode = createListItemNode(latterText);
+                newNode = createListItemNode(formerText);
                 newNodeParentId = parent.id;
             }
             // otherwise just add a new line below
             else {
-                newNode = createTextNode(latterText);
-                newNodeParentId = elementNodeId;
+                newNode = createTextNode(formerText);
+                newNodeParentId = node.id;
             }
-
-            let syncedNodes = insertNodeAfter(nodes, newNodeParentId, newNode);
-            syncedNodes = updateNodeById(syncedNodes, elementNodeId, {
+            
+            syncedNodes = insertNodeBefore(syncedNodes, newNodeParentId, newNode);
+            syncedNodes = updateNodeById(syncedNodes, node.id, {
                 ...node,
-                content: formerText
+                content: latterText
             });
 
             replaceNodes(syncedNodes);
-            const childTextNode = findNodeOfType(newNode, NODE_TYPES.TEXT);
-            if (childTextNode) focusNode(childTextNode.id, 0);
+            focusNode(node.id, 0);
             return;
         }
         
@@ -162,27 +253,9 @@ const EditorInner = ({className}: {className?: string}) => {
             const selection = window.getSelection();
             if (!selection || selection.rangeCount === 0) return;
 
-            // if items are multi-selected / highlighted
-            if (!selection.isCollapsed) {
-                e.preventDefault();
-                return;
+            let syncedNodes = [...nodes];
 
-                /*const range = getSelectedNodes(syncedNodes);
-                if (!range) return;
-
-                const deadNodes = range.nodesInRange(syncedNodes);
-                const deadNodeIds = deadNodes.map(n => n.id);
-
-                const updatedNodes = syncedNodes.filter(n => !deadNodeIds.includes(n.id));
-                replaceNodes(updatedNodes.length !== 0 ? updatedNodes : [createTextNode()]);*/
-            }
-
-            let element = getActiveElement();
-            if (!element) {
-                return;
-            }
-
-            let target = findNodeById(nodes, element.dataset.nodeId!);
+            let target = getActiveNode(syncedNodes);
             if (!target) return;
 
             let {node, nodePath} = target;
@@ -192,17 +265,14 @@ const EditorInner = ({className}: {className?: string}) => {
             const range = selection.getRangeAt(0);
 
             // if line is at the start
-            if (range.startOffset === 0) {
+            if (selection.isCollapsed && range.startOffset === 0) {
                 e.preventDefault();
-                
+
                 const nodeBefore = getNodeBefore(nodes, node.id);
-                console.log(nodeBefore);
                 if (!nodeBefore?.node) return;
 
                 const parentPath = getParentPath(nodePath);
                 const parent = getNodeAtPath(nodes, parentPath);
-
-                let syncedNodes = [...nodes];
 
                 // if node has no other text nodes before it (last node)
                 const textNodeBefore = findNodeOfType(nodeBefore.node, NODE_TYPES.TEXT);
@@ -225,7 +295,7 @@ const EditorInner = ({className}: {className?: string}) => {
                 const nodeBeforeParent = getNodeAtPath(nodes, getParentPath(nodeBefore.nodePath));
                 // if text node was the first element in a list
                 if (parent && !nodeBeforeParent && parent.type === NODE_TYPES.LIST_ITEM && parentPath[parentPath.length - 1] === 0) {
-                    const newNode = {...createTextNode(), id: node.id}
+                    const newNode = {...createTextNode(), id: node.id};
                     
                     syncedNodes = insertNodeAfter(syncedNodes, nodeBefore.node.id, newNode);
                     focusedNode = findNodeOfType(newNode, NODE_TYPES.TEXT);
@@ -234,7 +304,7 @@ const EditorInner = ({className}: {className?: string}) => {
 
                 // if we haven't already focused a node, focus it to text before
                 focusedNode = focusedNode || textNodeBefore;
-                focusOffset = focusOffset === undefined ? textNodeBefore.content.length : focusOffset;
+                focusOffset = focusedNode.content.length;
 
                 syncedNodes = updateNodeById(syncedNodes, focusedNode.id, {
                     ...focusedNode,
@@ -289,7 +359,6 @@ const EditorInner = ({className}: {className?: string}) => {
                 
                 shiftedNode = {...parentNode};
                 const shiftedNodeOrder = listNodePath[listNodePath.length - 2] + 1;
-                console.log(shiftedNodeOrder);
 
                 syncedNodes = updateNodeById(syncedNodes, newParentList.id, {
                     ...newParentList,
@@ -331,12 +400,13 @@ const EditorInner = ({className}: {className?: string}) => {
             <div className="flex flex-col gap-4 w-full">
                 <p>Rosette</p>
                 <div
-                className="flex flex-col gap-2 items-start bg-(--color-dark-slate) p-4 inset-shadow-md whitespace-pre-wrap w-full max-h-200 overflow-scroll"
+                className="items-start bg-(--color-dark-slate) p-4 inset-shadow-md whitespace-pre-wrap w-full max-h-200 overflow-scroll"
                 contentEditable
                 suppressContentEditableWarning
                 ref={editorRef}
                 onKeyDown={keyDownHandler}
-                onPaste={(e) => e.preventDefault()}
+                onCopy={copyHandler}
+                onPaste={pasteHandler}
                 >
                     {nodes.map((n: RosetteNode) => renderNode(n))}
                 </div>
