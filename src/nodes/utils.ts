@@ -1,5 +1,4 @@
 
-import { renderToStaticMarkup } from "react-dom/server";
 import { NodeRange } from "../types/NodeRange";
 import type { FindNodeResult, RosetteNode, RosetteNodeOfType, RosetteNodeType } from "./types";
 import { renderNode } from "./renderNode";
@@ -283,6 +282,3 @@ export const deleteNodeById = (nodes: RosetteNode[], nodeId: string) => {
     }
 }
 
-export function formatRosetteToHtml(nodes: RosetteNode[]): string {
-    return nodes.map(node => renderToStaticMarkup(renderNode(node))).join('');
-}
