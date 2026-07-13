@@ -3,7 +3,7 @@ import ToolbarButton from "../ToolbarButton";
 import { NODE_TYPES, type OrderedListNode, type RosetteNode, type TextNode, type UnorderedListNode } from "../../nodes/types";
 import { renderNode } from "../../nodes/renderNode";
 import { copyNodes, createListItemNode, createOrderedListNode, createTextNode, createUnorderedListNode } from "../../nodes/factories";
-import { findNodeById, findNodeOfType, getActiveElement, getActiveNode, getNodeAtPath, getNodeBefore, getParentPath, getSelectedNodes, updateNodeById } from "../../nodes/utils";
+import { deleteNodeById, findNodeById, findNodeOfType, getActiveElement, getActiveNode, getNodeAtPath, getNodeBefore, getParentPath, getSelectedNodes, updateNodeById } from "../../nodes/utils";
 import { EditorProvider, useEditor } from "../../providers/editor/EditorProvider";
 import { deleteNode, insertToolbarNode, insertNodeAfter, insertNodeBefore } from "../../nodes/commands";
 import { useEffect, useRef, type ClipboardEvent, type KeyboardEvent } from "react";
@@ -47,34 +47,75 @@ const EditorInner = ({className}: {className?: string}) => {
         const selection = window.getSelection();
         if (!selection || selection.isCollapsed) return;
 
+        const range = selection.getRangeAt(0);
         const selectedNodes = getSelectedNodes(nodes);
-
-        const topNodes: RosetteNode[] = [];
-        const topNodeIds: string[] = [];
-
-        for (let nodeResult of selectedNodes) {
-            let {nodePath} = nodeResult;
-
-            let topNode = getNodeAtPath(nodes, [nodePath[0]]);
-            if (!topNode) continue;
-
-            if (!topNodeIds.includes(topNode.id)) {
-                topNodes.push(topNode);
-                topNodeIds.push(topNode.id);
-            }
-        }
+        if (selectedNodes.length === 0) return;
 
         e.clipboardData.setData("text/plain", selection.toString());
+
+        // Single text node: copy only the selected portion
+        if (selectedNodes.length === 1) {
+            const textNode = selectedNodes[0].node as TextNode;
+            const trimmed = createTextNode(textNode.content.slice(range.startOffset, range.endOffset));
+            e.clipboardData.setData("application/rosette+json", JSON.stringify([trimmed]));
+            return;
+        }
+
+        // Multiple text nodes: recursively prune each top-level node to only the
+        // selected content, trimming the boundary text nodes.
+        const startTextNode = selectedNodes[0].node as TextNode;
+        const endTextNode = selectedNodes[selectedNodes.length - 1].node as TextNode;
+        const startOffset = range.startOffset;
+        const endOffset = range.endOffset;
+
+        const selectedIds = new Set(selectedNodes.map(nr => nr.node.id));
+
+        const pruneToSelection = (node: RosetteNode): RosetteNode | null => {
+            if (node.type === NODE_TYPES.TEXT) {
+                if (!selectedIds.has(node.id)) return null;
+                const tn = node as TextNode;
+                let content = tn.content;
+                if (node.id === startTextNode.id) content = content.slice(startOffset);
+                if (node.id === endTextNode.id) content = content.slice(0, endOffset);
+                return { ...tn, content };
+            }
+
+            if (!node.nodes) return node;
+
+            const prunedChildren = node.nodes
+                .map(pruneToSelection)
+                .filter((child): child is RosetteNode => child !== null);
+
+            if (prunedChildren.length === 0) return null;
+            return { ...node, nodes: prunedChildren };
+        };
+
+        // Collect unique top-level indices in document order, then prune each
+        const seenTopIndices = new Set<number>();
+        const topNodes: RosetteNode[] = [];
+
+        for (const nodeResult of selectedNodes) {
+            const topIndex = nodeResult.nodePath[0];
+            if (seenTopIndices.has(topIndex)) continue;
+            seenTopIndices.add(topIndex);
+
+            const topNode = getNodeAtPath(nodes, [topIndex]);
+            if (!topNode) continue;
+            const pruned = pruneToSelection(topNode);
+            if (pruned) topNodes.push(pruned);
+        }
+
         e.clipboardData.setData("application/rosette+json", JSON.stringify(topNodes));
     }
 
     const pasteHandler = (e: ClipboardEvent<HTMLDivElement>) => {
         e.preventDefault();
 
-        let syncedNodes = nodes;
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return;
 
-        const activeNode = getActiveNode(syncedNodes);
-        if (!activeNode) return;
+        const range = selection.getRangeAt(0);
+        let syncedNodes = nodes;
 
         const rosetteData = e.clipboardData.getData("application/rosette+json");
         const plainText = e.clipboardData.getData("text/plain");
@@ -82,20 +123,87 @@ const EditorInner = ({className}: {className?: string}) => {
         let newNodes: RosetteNode[] = [];
         if (rosetteData) {
             newNodes = copyNodes(JSON.parse(rosetteData));
-        }
-        else if (plainText) {
+        } else if (plainText) {
             const lines = plainText.split(/\r?\n/).map(l => l.trim());
             newNodes = lines.map(line => createTextNode(line));
         }
 
         if (newNodes.length === 0) return;
 
-        syncedNodes = insertNodeAfter(syncedNodes, activeNode.node.id, newNodes);
+        // Determine the insertion anchor, beforeText, and afterText by
+        // removing any selected content from the tree first.
+        let insertAfterId: string;
+        let beforeText: string;
+        let afterText: string;
+
+        if (!selection.isCollapsed) {
+            const selectedNodesResults = getSelectedNodes(syncedNodes);
+
+            if (selectedNodesResults.length >= 2) {
+                // Selection spans multiple text nodes
+                const startNode = selectedNodesResults[0].node as TextNode;
+                const endNode = selectedNodesResults[selectedNodesResults.length - 1].node as TextNode;
+                const middleNodes = selectedNodesResults.slice(1, -1);
+
+                beforeText = startNode.content.slice(0, range.startOffset);
+                afterText = endNode.content.slice(range.endOffset);
+
+                syncedNodes = updateNodeById(syncedNodes, startNode.id, { ...startNode, content: beforeText });
+                for (const nr of middleNodes) {
+                    syncedNodes = deleteNode(syncedNodes, nr.node.id);
+                }
+                syncedNodes = deleteNode(syncedNodes, endNode.id);
+                insertAfterId = startNode.id;
+            } else {
+                // Selection within a single text node
+                const activeNode = getActiveNode(syncedNodes);
+                if (!activeNode || activeNode.node.type !== NODE_TYPES.TEXT) return;
+                const textNode = activeNode.node as TextNode;
+
+                beforeText = textNode.content.slice(0, range.startOffset);
+                afterText = textNode.content.slice(range.endOffset);
+                syncedNodes = updateNodeById(syncedNodes, textNode.id, { ...textNode, content: beforeText });
+                insertAfterId = textNode.id;
+            }
+        } else {
+            // Collapsed cursor — split at cursor position
+            const activeNode = getActiveNode(syncedNodes);
+            if (!activeNode || activeNode.node.type !== NODE_TYPES.TEXT) return;
+            const textNode = activeNode.node as TextNode;
+            const cursorOffset = range.startOffset;
+
+            beforeText = textNode.content.slice(0, cursorOffset);
+            afterText = textNode.content.slice(cursorOffset);
+            syncedNodes = updateNodeById(syncedNodes, textNode.id, { ...textNode, content: beforeText });
+            insertAfterId = textNode.id;
+        }
+
+        // Single text node: merge inline into the anchor node
+        if (newNodes.length === 1 && newNodes[0].type === NODE_TYPES.TEXT) {
+            const pastedText = (newNodes[0] as TextNode).content;
+            const combinedContent = beforeText + pastedText + afterText;
+            syncedNodes = updateNodeById(syncedNodes, insertAfterId, {
+                ...(findNodeById(syncedNodes, insertAfterId)!.node as TextNode),
+                content: combinedContent
+            });
+            replaceNodes(syncedNodes);
+            focusNode(insertAfterId, beforeText.length + pastedText.length);
+            return;
+        }
+
+        // Multiple nodes: insert pasted nodes after anchor, then afterText if needed
+        syncedNodes = insertNodeAfter(syncedNodes, insertAfterId, newNodes);
+
+        if (afterText.length > 0) {
+            const afterTextNode = createTextNode(afterText);
+            syncedNodes = insertNodeAfter(syncedNodes, newNodes[newNodes.length - 1].id, afterTextNode);
+        }
+
         replaceNodes(syncedNodes);
 
-        // focus last node
-        let lastNode = newNodes.at(-1)!;
-        let focusedTextNode = findNodeOfType(lastNode, NODE_TYPES.TEXT);
+        // Focus the deepest text node in the last pasted node
+        const lastNode = newNodes[newNodes.length - 1];
+        const focusedTextNode = findNodeOfType(lastNode, NODE_TYPES.TEXT);
         if (!focusedTextNode) return;
         focusNode(focusedTextNode.id, focusedTextNode.content.length);
     }
@@ -213,7 +321,49 @@ const EditorInner = ({className}: {className?: string}) => {
                 const parent = getNodeAtPath(nodes, parentPath);
                 if (!parent) return;
 
-                // if text blank
+                // Shift+Enter inside a list-item: soft newline (new text node within same list-item)
+                if (e.shiftKey && parent.type === NODE_TYPES.LIST_ITEM) {
+                    const newTextNode = createTextNode(formerText);
+                    syncedNodes = insertNodeBefore(syncedNodes, node.id, newTextNode);
+                    syncedNodes = updateNodeById(syncedNodes, node.id, { ...node, content: latterText });
+                    replaceNodes(syncedNodes);
+                    focusNode(node.id, 0);
+                    return;
+                }
+
+                // Enter inside a list-item that has sibling text nodes: split the list-item.
+                // Current item keeps nodes[0..cursor], new item gets nodes[cursor+1..end].
+                const nodeIndexInParent = nodePath[nodePath.length - 1];
+                const hasListItemSiblings = parent.type === NODE_TYPES.LIST_ITEM
+                    && parent.nodes != null
+                    && parent.nodes.length > 1;
+
+                if (hasListItemSiblings) {
+                    const remainingSiblings = parent.nodes!.slice(nodeIndexInParent + 1);
+
+                    // New list-item: latterText (if any) + siblings after cursor
+                    const newItemNodes: RosetteNode[] = [];
+                    if (latterText.length > 0) newItemNodes.push(createTextNode(latterText));
+                    newItemNodes.push(...copyNodes(remainingSiblings));
+                    if (newItemNodes.length === 0) newItemNodes.push(createTextNode());
+
+                    const newListItem = { ...createListItemNode(), nodes: newItemNodes };
+
+                    // Current list-item: nodes before cursor + current node trimmed to formerText
+                    let updatedCurrentNodes: RosetteNode[] = parent.nodes!.slice(0, nodeIndexInParent);
+                    if (formerText.length > 0) updatedCurrentNodes = [...updatedCurrentNodes, { ...node, content: formerText }];
+                    if (updatedCurrentNodes.length === 0) updatedCurrentNodes = [createTextNode()];
+
+                    syncedNodes = updateNodeById(syncedNodes, parent.id, { ...parent, nodes: updatedCurrentNodes });
+                    syncedNodes = insertNodeAfter(syncedNodes, parent.id, newListItem);
+
+                    replaceNodes(syncedNodes);
+                    const focusTarget = findNodeOfType(newListItem, NODE_TYPES.TEXT);
+                    if (focusTarget) focusNode(focusTarget.id, 0);
+                    return;
+                }
+
+                // if text blank (single text node in list-item)
                 if (node.content === "") {
                     const listNode = getNodeAtPath(nodes, getParentPath(nodePath, 2));
                     if (!listNode) return;
@@ -289,6 +439,21 @@ const EditorInner = ({className}: {className?: string}) => {
 
                 var focusedNode;
                 var focusOffset;
+
+                // If the node has a preceding sibling inside the same list-item, just merge
+                // with that sibling directly — don't let deleteNode escalate to the list-item.
+                const nodeIndexInParent = nodePath[nodePath.length - 1];
+                if (parent && parent.type === NODE_TYPES.LIST_ITEM && nodeIndexInParent > 0) {
+                    const mergeOffset = textNodeBefore.content.length;
+                    syncedNodes = updateNodeById(syncedNodes, textNodeBefore.id, {
+                        ...textNodeBefore,
+                        content: textNodeBefore.content + node.content
+                    });
+                    syncedNodes = deleteNodeById(syncedNodes, node.id);
+                    replaceNodes(syncedNodes);
+                    focusNode(textNodeBefore.id, mergeOffset);
+                    return;
+                }
 
                 syncedNodes = deleteNode(syncedNodes, node.id);
 

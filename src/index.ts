@@ -6,6 +6,7 @@ export {default as Editor} from "./components/Editor/Editor";
 // utils
 export {renderNode} from "./nodes/renderNode";
 export {convertFromRicosDocument} from "./nodes/ricos";
+export {formatRosetteToHtml} from "./nodes/utils";
 
 // factories
 export {

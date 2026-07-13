@@ -1,6 +1,8 @@
 
+import { renderToStaticMarkup } from "react-dom/server";
 import { NodeRange } from "../types/NodeRange";
 import type { FindNodeResult, RosetteNode, RosetteNodeOfType, RosetteNodeType } from "./types";
+import { renderNode } from "./renderNode";
 
 
 export const getParentPath = (path: number[], generation: number = 1) => path.slice(0, -generation);
@@ -108,7 +110,7 @@ export const getSelectedNodes = (nodes: RosetteNode[]) => {
 
     const editor = getEditorElement(root);
 
-    const elements = [...editor.querySelectorAll<HTMLElement>(`[data-node-type="text"]`)]
+    const elements = Array.from(editor.querySelectorAll<HTMLElement>(`[data-node-type="text"]`))
         .filter(el => range.intersectsNode(el));
 
     return elements
@@ -279,4 +281,8 @@ export const deleteNodeById = (nodes: RosetteNode[], nodeId: string) => {
 
         return updatedNodes;
     }
+}
+
+export function formatRosetteToHtml(nodes: RosetteNode[]): string {
+    return nodes.map(node => renderToStaticMarkup(renderNode(node))).join('');
 }
