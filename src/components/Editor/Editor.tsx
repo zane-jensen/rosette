@@ -340,26 +340,35 @@ const EditorInner = ({className}: {className?: string}) => {
 
                 if (hasListItemSiblings) {
                     const remainingSiblings = parent.nodes!.slice(nodeIndexInParent + 1);
+                    const remainingTextSiblings = remainingSiblings.filter(s => s.type === NODE_TYPES.TEXT);
+                    const remainingNonTextSiblings = remainingSiblings.filter(s => s.type !== NODE_TYPES.TEXT);
 
-                    // New list-item: latterText (if any) + siblings after cursor
-                    const newItemNodes: RosetteNode[] = [];
-                    if (latterText.length > 0) newItemNodes.push(createTextNode(latterText));
-                    newItemNodes.push(...copyNodes(remainingSiblings));
-                    if (newItemNodes.length === 0) newItemNodes.push(createTextNode());
+                    // Non-text siblings (nested lists) follow the content.
+                    // If the cursor is at the start (formerText is empty), the current item
+                    // becomes empty so nested children go with the new item. Otherwise they stay.
+                    const nonTextGoWithNew = formerText.length === 0;
+
+                    // Always create the first text node explicitly so we can focus it directly.
+                    // (findNodeOfType searches in reverse and would land inside a nested list.)
+                    const newFirstTextNode = createTextNode(latterText);
+                    const newItemNodes: RosetteNode[] = [newFirstTextNode];
+                    newItemNodes.push(...copyNodes(remainingTextSiblings));
+                    if (nonTextGoWithNew) newItemNodes.push(...copyNodes(remainingNonTextSiblings));
 
                     const newListItem = { ...createListItemNode(), nodes: newItemNodes };
 
                     // Current list-item: nodes before cursor + current node trimmed to formerText
+                    // + non-text siblings if they're staying here
                     let updatedCurrentNodes: RosetteNode[] = parent.nodes!.slice(0, nodeIndexInParent);
                     if (formerText.length > 0) updatedCurrentNodes = [...updatedCurrentNodes, { ...node, content: formerText }];
+                    if (!nonTextGoWithNew) updatedCurrentNodes = [...updatedCurrentNodes, ...remainingNonTextSiblings];
                     if (updatedCurrentNodes.length === 0) updatedCurrentNodes = [createTextNode()];
 
                     syncedNodes = updateNodeById(syncedNodes, parent.id, { ...parent, nodes: updatedCurrentNodes });
                     syncedNodes = insertNodeAfter(syncedNodes, parent.id, newListItem);
 
                     replaceNodes(syncedNodes);
-                    const focusTarget = findNodeOfType(newListItem, NODE_TYPES.TEXT);
-                    if (focusTarget) focusNode(focusTarget.id, 0);
+                    focusNode(newFirstTextNode.id, 0);
                     return;
                 }
 
