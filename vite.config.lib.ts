@@ -23,9 +23,11 @@ export default defineConfig({
   build: {
     emptyOutDir: false,
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
+      entry: {
+        "rich-editor": resolve(__dirname, 'src/index.ts'),
+        "server": resolve(__dirname, 'src/server/index.ts'),
+      },
       name: "Rosette",
-      fileName: "rich-editor",
       formats: ["es"]
     },
 
@@ -33,6 +35,7 @@ export default defineConfig({
       external: [
         'react',
         'react-dom',
+        'react-dom/server',
         'react/jsx-runtime'
       ],
       output: {

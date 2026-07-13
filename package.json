@@ -8,6 +8,10 @@
       "import": "./dist/rich-editor.js",
       "types": "./dist/index.d.ts"
     },
+    "./server": {
+      "import": "./dist/server.js",
+      "types": "./dist/server/index.d.ts"
+    },
     "./style.css": "./dist/rich-editor.css"
   },
   "files": [
