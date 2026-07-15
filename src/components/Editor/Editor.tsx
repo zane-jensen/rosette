@@ -388,23 +388,29 @@ const EditorInner = ({className}: {className?: string}) => {
                     return;
                 }
                 
-                newNode = createListItemNode(formerText);
+                // CASE 4 - single text node list item: insert a new list item after with latterText
+                const newItemText = createTextNode(latterText);
+                newNode = { ...createListItemNode(), nodes: [newItemText] };
                 newNodeParentId = parent.id;
+                var newFocusId = newItemText.id;
             }
             // otherwise just add a new line below
             else {
-                newNode = createTextNode(formerText);
+                // CASE 5 - top level text node: insert new text node after with latterText
+                newNode = createTextNode(latterText);
                 newNodeParentId = node.id;
+                var newFocusId = newNode.id;
             }
-            
-            syncedNodes = insertNodeBefore(syncedNodes, newNodeParentId, newNode);
+
+            // Keep original node with formerText (preserving its ID), new node gets latterText
             syncedNodes = updateNodeById(syncedNodes, node.id, {
                 ...node,
-                content: latterText
+                content: formerText
             });
+            syncedNodes = insertNodeAfter(syncedNodes, newNodeParentId, newNode);
 
             replaceNodes(syncedNodes);
-            focusNode(node.id, 0);
+            focusNode(newFocusId, 0);
             return;
         }
         
