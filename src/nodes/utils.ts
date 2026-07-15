@@ -1,7 +1,6 @@
 
 import { NodeRange } from "../types/NodeRange";
 import type { FindNodeResult, RosetteNode, RosetteNodeOfType, RosetteNodeType } from "./types";
-import { renderNode } from "./renderNode";
 
 
 export const getParentPath = (path: number[], generation: number = 1) => path.slice(0, -generation);

@@ -1,7 +1,7 @@
 import './App.css'
 import Editor from './components/Editor/Editor'
 import { convertFromRicosDocument } from './nodes/ricos'
-import { TEST_RICOS_CONTENT } from '../public/ricos-sample'
+import { TEST_RICOS_CONTENT } from './tests/ricos-sample'
 
 function App() {
 
