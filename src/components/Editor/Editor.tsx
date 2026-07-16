@@ -1,4 +1,3 @@
-import Panel from "../Panel";
 import ToolbarButton from "../ToolbarButton";
 import { NODE_TYPES, type OrderedListNode, type RosetteNode, type TextNode, type UnorderedListNode } from "../../nodes/types";
 import { renderNode } from "../../nodes/renderNode";
@@ -314,6 +313,7 @@ const EditorInner = ({className}: {className?: string}) => {
 
             var newNode;
             var newNodeParentId;
+            var newFocusId: string;
 
             // if nested inside of something
             if (nodePath.length > 1) {
@@ -392,14 +392,14 @@ const EditorInner = ({className}: {className?: string}) => {
                 const newItemText = createTextNode(latterText);
                 newNode = { ...createListItemNode(), nodes: [newItemText] };
                 newNodeParentId = parent.id;
-                var newFocusId = newItemText.id;
+                newFocusId = newItemText.id;
             }
             // otherwise just add a new line below
             else {
                 // CASE 5 - top level text node: insert new text node after with latterText
                 newNode = createTextNode(latterText);
                 newNodeParentId = node.id;
-                var newFocusId = newNode.id;
+                newFocusId = newNode.id;
             }
 
             // Keep original node with formerText (preserving its ID), new node gets latterText
@@ -576,35 +576,32 @@ const EditorInner = ({className}: {className?: string}) => {
     }
 
     return (
-        <Panel className={className}>
-            <div className="flex flex-col gap-4 w-full">
-                <p>Rosette</p>
-                <div
-                className="items-start bg-(--color-dark-slate) p-4 inset-shadow-md whitespace-pre-wrap w-full max-h-200 overflow-scroll"
-                contentEditable
-                suppressContentEditableWarning
-                ref={editorRef}
-                onKeyDown={keyDownHandler}
-                onCopy={copyHandler}
-                onPaste={pasteHandler}
-                >
-                    {nodes.map((n: RosetteNode) => renderNode(n))}
-                </div>
-                {/** Toolbar */}
-                <div className="flex gap-4">
-                    <ToolbarButton
-                        buttonText="OL"
-                        node={createOrderedListNode}
-                        onClick={toolbarHandler}
-                    />
-                    <ToolbarButton
-                        buttonText="UL"
-                        node={createUnorderedListNode}
-                        onClick={toolbarHandler}
-                    />
-                </div>
+        <div className={className}>
+            <div
+            className="items-start bg-(--color-dark-slate) p-4 inset-shadow-md whitespace-pre-wrap w-full max-h-200 overflow-scroll"
+            contentEditable
+            suppressContentEditableWarning
+            ref={editorRef}
+            onKeyDown={keyDownHandler}
+            onCopy={copyHandler}
+            onPaste={pasteHandler}
+            >
+                {nodes.map((n: RosetteNode) => renderNode(n))}
             </div>
-        </Panel>
+            {/** Toolbar */}
+            <div className="flex bg-(--color-dark-slate) border-t border-white/10">
+                <ToolbarButton
+                    buttonText="OL"
+                    node={createOrderedListNode}
+                    onClick={toolbarHandler}
+                />
+                <ToolbarButton
+                    buttonText="UL"
+                    node={createUnorderedListNode}
+                    onClick={toolbarHandler}
+                />
+            </div>
+        </div>
     )
 }
 
