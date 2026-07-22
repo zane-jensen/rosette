@@ -40,7 +40,7 @@ export default defineConfig({
       ],
       output: {
         format: "es",
-        entryFileNames: "rich-editor.js"
+        entryFileNames: "[name].js"
       }
     }
   }
